@@ -6,6 +6,44 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<inceptionYear>2009</inceptionYear>
 	<name>Scala Circuit Breaker</name>
+	<description>An implementation of the Circuit Breaker stability design pattern with Scala</description>
+
+	<organization>
+        <name>spiros.blog()</name>
+        <url>http://www.tzavellas.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>http://github.com/sptz45/sse-breaker/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>sptz45</id>
+            <name>Spiros Tzavellas</name>
+            <email>spiros at tzavellas dot com</email>
+            <url>http://www.tzavellas.com</url>
+            <timezone>+2</timezone>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/sptz45/sse-breaker.git</connection>
+        <developerConnection>scm:git:git@github.com:sptz45/sse-breaker.git</developerConnection>
+        <url>http://github.com/sptz45/sse-breaker/tree/master</url>
+    </scm>
+
 	<properties>
 	   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	   <scala.version>2.8.0-SNAPSHOT</scala.version>
@@ -53,6 +91,7 @@
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.13.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -68,17 +107,64 @@
 					</args>
 				</configuration>
 			</plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <archive>
+                        <compress>true</compress>
+                        <index>true</index>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
+		<extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
 	</build>
+
 	<reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.13.1</version>
 				<configuration>
 					<scalaVersion>${scala.version}</scalaVersion>
 				</configuration>
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<distributionManagement>
+        <repository>
+            <id>tzavellas.com-repo</id>
+            <url>scp://www.tzavellas.com:90/home/spiros/public_html/maven/</url>
+        </repository>
+        <site>
+            <id>tzavellas.com-site</id>
+            <url>scp://www.tzavellas.com:90/home/spiros/public_html/projects/sse-breaker
+            </url>
+        </site>
+    </distributionManagement>
 </project>
