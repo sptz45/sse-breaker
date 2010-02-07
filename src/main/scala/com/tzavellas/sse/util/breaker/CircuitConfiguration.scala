@@ -1,14 +1,7 @@
 package com.tzavellas.sse.util.breaker
 
-import CircuitConfiguration._
-
 case class CircuitConfiguration(
-    maxFailures: Int = defaultMaxFailures,
-    openCircuitTimeout: Duration = defaultOpenCircuitTimeout,
-    failureCountTimeout: Duration = defaultFailureCountTimeout)
+    maxFailures: Int = 5,
+    openCircuitTimeout: Duration = Duration.minutes(10),
+    failureCountTimeout: Duration = Duration.minutes(1))
 
-object CircuitConfiguration {
-  val defaultMaxFailures = 5
-  val defaultOpenCircuitTimeout = Duration.minutes(10)
-  val defaultFailureCountTimeout = Duration.minutes(1)
-}

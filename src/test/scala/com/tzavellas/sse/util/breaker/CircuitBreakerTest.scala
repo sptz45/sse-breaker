@@ -5,6 +5,7 @@ import org.junit.Assert._
 
 class CircuitBreakerTest {
 
+  val defaults = new CircuitConfiguration
   val executor = new CircuitExecutor
   
   @Test
@@ -63,7 +64,7 @@ class CircuitBreakerTest {
     val shortFailureCountTimeout = circuit.configuration.copy(failureCountTimeout = Duration.millis(1))  
     circuit.reconfigure(shortFailureCountTimeout)
     
-    generateFaults(CircuitConfiguration.defaultMaxFailures - 1)
+    generateFaults(defaults.maxFailures - 1)
     assertFalse(circuit.isOpen)
     Thread.sleep(5)
     
@@ -103,7 +104,7 @@ class CircuitBreakerTest {
   @Test
   def slow_metnod_executions_count_as_failures() {
     executor.maxMethodDuration = Duration.nanos(1)
-    for (i <- 0 until CircuitConfiguration.defaultMaxFailures)
+    for (i <- 0 until defaults.maxFailures)
       makeNormalCall()
     assertTrue("Should be open since the maxMethodDuration is to short", executor.breaker.isOpen)
   }
@@ -127,7 +128,7 @@ class CircuitBreakerTest {
   }
   
   def generateFaultsToOpen() {
-    generateFaults(CircuitConfiguration.defaultMaxFailures)
+    generateFaults(defaults.maxFailures)
   }
   
   def generateFaults(numOfFaults: Int) {
