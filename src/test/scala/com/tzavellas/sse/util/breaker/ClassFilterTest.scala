@@ -20,7 +20,7 @@ class ClassFilterTest {
   }
   
   @Test
-  def adding_null_does_noting() {
+  def adding_null_does_nothing() {
     classes += null
     assertTrue(classes.isEmpty)
     classes ++= null
@@ -67,4 +67,3 @@ class ClassFilterTest {
     assertEquals(1, classes.size)
   }
 }
-
