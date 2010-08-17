@@ -16,14 +16,14 @@ class CircuitBreakerTest {
   @Test(expected=classOf[OpenCircuitException])
   def after_a_number_of_faults_the_circuit_opens() {
     generateFaultsToOpen()
-    makeNormalCall(shouldFail=true)
+    makeNormalCall(circuitIsOpen=true)
   }
   
   @Test
   def the_circuit_can_be_opened_after_being_closed() {
     generateFaultsToOpen()
     try {
-      makeNormalCall(shouldFail=true)
+      makeNormalCall(circuitIsOpen=true)
     } catch {
       case e: OpenCircuitException =>
        val c = e.circuit
@@ -84,7 +84,7 @@ class CircuitBreakerTest {
   }
   
   @Test
-  def ignored_exceptions_do_not_open_a_circuit() {
+  def ignored_exceptions_do_not_open_the_circuit() {
     executor.ignoreException(classOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
@@ -117,12 +117,12 @@ class CircuitBreakerTest {
     circuit
   }
   
-  def makeNormalCall(shouldFail: Boolean = false) = {
+  def makeNormalCall(circuitIsOpen: Boolean = false) = {
     try {
       executor(normalOperation)
     } catch {
       case e: OpenCircuitException => 
-        if (shouldFail) throw e
+        if (circuitIsOpen) throw e
         else throw new AssertionError("Unexpected OpenCircuitException!", e)
     }
   }

@@ -37,7 +37,7 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
       tmpCurrentFailures = currentFailures.incrementAndGet()
     }
     if (tmpCurrentFailures >= conf.maxFailures)
-        open();
+        open()
   }
   
   private def resetFailures() {
@@ -57,7 +57,7 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
   
   def currentFailureCount = currentFailures.get
   
-  def hasExpired = {
+  private def hasExpired = {
     val timestampt = openTimestamp.get() 
     timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis()
   }
