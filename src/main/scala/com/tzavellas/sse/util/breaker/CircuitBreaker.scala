@@ -8,19 +8,26 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
  * <p>Instances of this class are thread-safe.</p>
  * 
  * @see CircuitExecutor
- * @author spiros
  */
 class CircuitBreaker(initConf: CircuitConfiguration) {
   
   @volatile
   private[this] var conf = initConf
   
-  private[this] val currentFailures = new AtomicInteger(0)
-  private[this] val openTimestamp = new AtomicLong()
-  private[this] val firstCurrentFailureTimestamp = new AtomicLong()
+  private[this] val currentFailures = new AtomicInteger
+  private[this] val openTimestamp = new AtomicLong
+  private[this] val firstCurrentFailureTimestamp = new AtomicLong
 
+  private[this] val calls = new AtomicInteger
+  private[this] val failures = new AtomicInteger
+  private[this] val timesOpened = new AtomicInteger
+  
+  private[breaker] def recordCall() {
+    calls.incrementAndGet()
+  }
   
   private[breaker] def recordFailure() {
+    failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
     if (conf.failureCountTimeout.hasPastSince(firstCurrentFailureTimestamp.get())) {
@@ -48,6 +55,8 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
   
   def isHalfOpen = hasExpired
   
+  def currentFailureCount = currentFailures.get
+  
   def hasExpired = {
     val timestampt = openTimestamp.get() 
     timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis()
@@ -59,6 +68,7 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
   }
   
   def open() {
+    timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis())  
     currentFailures.set(conf.maxFailures)
   }
@@ -69,5 +79,5 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
     conf = newConf
   }
 
-  def currentFailureCount = currentFailures.get
 }
+
