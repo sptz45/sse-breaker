@@ -7,6 +7,7 @@ class CircuitBreakerTest {
 
   val defaults = new CircuitConfiguration
   val executor = new CircuitExecutor
+  def circuit  = executor.breaker
   
   @Test
   def normal_operation_while_closed() {
@@ -39,7 +40,7 @@ class CircuitBreakerTest {
   
   @Test
   def the_circuit_is_half_open_after_the_timeout() {
-    val circuit = reconfigureWithShortTimeout()
+    reconfigureWith(openCircuitTimeout = Duration.millis(1))
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue("The circuit should have been half-open after the timeout", circuit.isHalfOpen)
@@ -50,7 +51,7 @@ class CircuitBreakerTest {
   
   @Test
   def the_circuit_moves_from_half_open_to_open_on_first_failure() {
-    val circuit = reconfigureWithShortTimeout()
+    reconfigureWith(openCircuitTimeout = Duration.millis(1))
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -60,11 +61,10 @@ class CircuitBreakerTest {
   
   @Test
   def slow_methods_do_not_close_the_circuit_when_half_open() {
-    val circuit = reconfigureWithShortTimeout()
+    reconfigureWith(openCircuitTimeout = Duration.millis(1))
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
-    executor.maxMethodDuration = Duration.nanos(1)
     makeSlowCall()
     assertFalse(circuit.isHalfOpen)
     assertTrue(circuit.isOpen)
@@ -72,14 +72,10 @@ class CircuitBreakerTest {
   
   @Test
   def the_failure_count_gets_reset_after_an_amount_of_time() {
-    val circuit = executor.breaker
-    val shortFailureCountTimeout = circuit.configuration.copy(failureCountTimeout = Duration.millis(1))  
-    circuit.reconfigure(shortFailureCountTimeout)
-    
+    reconfigureWith(failureCountTimeout = Duration.millis(1))
     generateFaults(defaults.maxFailures - 1)
     assertFalse(circuit.isOpen)
     Thread.sleep(5)
-    
     generateFaults(1)
     assertFalse("Must be open since the failure count must have been expired", circuit.isOpen)
     makeNormalCall()
@@ -87,9 +83,7 @@ class CircuitBreakerTest {
   
   @Test
   def disable_breaker_by_setting_extremly_low_failure_count_timeout() {
-    val circuit = executor.breaker
-    val shortFailureCountTimeout = circuit.configuration.copy(failureCountTimeout = Duration.nanos(1))  
-    circuit.reconfigure(shortFailureCountTimeout)
+    reconfigureWith(failureCountTimeout = Duration.nanos(1))  
     generateFaultsToOpen()
     makeNormalCall()
     assertFalse(circuit.isOpen)
@@ -100,8 +94,8 @@ class CircuitBreakerTest {
     executor.ignoreException(classOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
-    assertFalse(executor.breaker.isOpen)
-    executor.removeIgnoredExcpetion(classOf[IllegalStateException])
+    assertFalse(circuit.isOpen)
+    executor.removeIgnoredException(classOf[IllegalStateException])
   }
   
   @Test
@@ -109,24 +103,25 @@ class CircuitBreakerTest {
     executor.ignoreException(classOf[RuntimeException])
     generateFaultsToOpen()
     makeNormalCall()
-    assertFalse(executor.breaker.isOpen)
-    executor.removeIgnoredExcpetion(classOf[RuntimeException])
+    assertFalse(circuit.isOpen)
+    executor.removeIgnoredException(classOf[RuntimeException])
   }
   
   @Test
   def slow_metnod_executions_count_as_failures() {
-    executor.maxMethodDuration = Duration.nanos(1)
     for (i <- 0 until defaults.maxFailures)
-      makeNormalCall()
+      makeSlowCall()
     assertTrue("Should be open since the maxMethodDuration is to short", executor.breaker.isOpen)
   }
   
+  // -- Helper methods ----------------------------------------------------------
   
-  def reconfigureWithShortTimeout() = {
+  def reconfigureWith(
+    maxFailures: Int = defaults.maxFailures,
+    openCircuitTimeout: Duration = defaults.openCircuitTimeout,
+    failureCountTimeout: Duration = defaults.failureCountTimeout) {
     val circuit = executor.breaker
-    val shortTimeout = circuit.configuration.copy(openCircuitTimeout = Duration.millis(1))  
-    circuit.reconfigure(shortTimeout)
-    circuit
+    circuit.reconfigure(new CircuitConfiguration(maxFailures, openCircuitTimeout, failureCountTimeout))
   }
   
   def makeNormalCall(circuitIsOpen: Boolean = false) = {
@@ -152,7 +147,7 @@ class CircuitBreakerTest {
   
   def generateFaults(numOfFaults: Int) {
     for (i <- 0 until numOfFaults)
-      try { executor(faultyOperation) } catch { case _ => () }
+      try executor(faultyOperation) catch { case _ => () }
   }
   
   def normalOperation = 42 

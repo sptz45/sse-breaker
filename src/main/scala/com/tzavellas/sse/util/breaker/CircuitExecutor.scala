@@ -66,7 +66,7 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
    * 
    * @param exception the exception to stop ignoring
    */
-  def removeIgnoredExcpetion[T <: Throwable](exception: Class[T]) {
+  def removeIgnoredException[T <: Throwable](exception: Class[T]) {
     ignoredExceptions -= exception
   }
   
