@@ -59,6 +59,18 @@ class CircuitBreakerTest {
   }
   
   @Test
+  def slow_methods_do_not_close_the_circuit_when_half_open() {
+    val circuit = reconfigureWithShortTimeout()
+    generateFaultsToOpen()
+    Thread.sleep(2)
+    assertTrue(circuit.isHalfOpen)
+    executor.maxMethodDuration = Duration.nanos(1)
+    makeSlowCall()
+    assertFalse(circuit.isHalfOpen)
+    assertTrue(circuit.isOpen)
+  }
+  
+  @Test
   def the_failure_count_gets_reset_after_an_amount_of_time() {
     val circuit = executor.breaker
     val shortFailureCountTimeout = circuit.configuration.copy(failureCountTimeout = Duration.millis(1))  
@@ -125,6 +137,13 @@ class CircuitBreakerTest {
         if (circuitIsOpen) throw e
         else throw new AssertionError("Unexpected OpenCircuitException!", e)
     }
+  }
+  
+  def makeSlowCall() {
+    val previous = executor.maxMethodDuration 
+    executor.maxMethodDuration = Duration.nanos(1)
+    makeNormalCall()
+    executor.maxMethodDuration = previous
   }
   
   def generateFaultsToOpen() {
