@@ -5,7 +5,7 @@ import org.junit.Assert._
 
 class ClassFilterTest {
 
-  val classes = new ClassFilter
+  private val classes = new ClassFilter
   
   @Test
   def normal_operation() {

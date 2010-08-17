@@ -1,18 +1,19 @@
 package com.tzavellas.sse.util.breaker
 
-private[breaker] class ClassFilter {
+private class ClassFilter {
   
   @volatile
   private var classes = List[Class[_]]()
 
   def +=(c: Class[_]) {
     if (c == null) return
-    for (cls <- classes)
+    for (cls <- classes) {
       if (c.isAssignableFrom(cls)) {
         this -= cls
       } else if (cls.isAssignableFrom(c)) {
-        return;
+        return
       }
+    }
     classes = c :: classes
   }
 
@@ -21,7 +22,7 @@ private[breaker] class ClassFilter {
     for (c <- classes) this += (c)
   }
   
-  def contains(c: Class[_]) = classes.find(_.isAssignableFrom(c)) != None
+  def contains(c: Class[_]) = classes.exists(_ isAssignableFrom c)
 
   def isEmpty = classes.isEmpty
   
