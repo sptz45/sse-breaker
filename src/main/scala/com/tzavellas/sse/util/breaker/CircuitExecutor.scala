@@ -79,12 +79,13 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
    * @throws OpenCircuitException if the circuit-breaker is open.
    */
   def apply[T](operation: => T): T = {
+    breaker.recordCall()
+    assertTheCircuitIsClosed()
     try {
-      breaker.recordCall()
-      assertTheCircuitIsClosed()
       val result = execute(operation)
-      recordAsFailureIfItWasSlow(result.duration)
-      closeTheCircuitIfItIsHalfOpen()
+      val wasNotSlow = recordAsFailureIfItWasSlow(result.duration)
+      if (wasNotSlow)
+        closeTheCircuitIfItIsHalfOpen()
       result.value
     } catch {
       case e =>
@@ -98,13 +99,20 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
   private def assertTheCircuitIsClosed() {
     if (breaker.isOpen) throw new OpenCircuitException(breaker)
   }
-  private def recordAsFailureIfItWasSlow(duration: Long) {
-    if (duration >= maxMethodDuration.toNanos)
+  
+  private def recordAsFailureIfItWasSlow(duration: Long) = {
+    if (duration >= maxMethodDuration.toNanos) {
       breaker.recordFailure()
+      false
+    } else {
+      true
+    }
   }
+  
   private def closeTheCircuitIfItIsHalfOpen() {
     if (breaker.isHalfOpen) breaker.close()
   }
+  
   private def recordIfNotIgnored(e: Throwable) {
     if (! ignoredExceptions.contains(e.getClass))
       breaker.recordFailure()
