@@ -125,6 +125,17 @@ class CircuitBreakerTest {
     listener.assertCalledOnClose()
   }
   
+  @Test
+  def statistics_get_updated_as_the_ciruit_breaker_gets_used() {
+    makeNormalCall()
+    assertEquals(1, circuit.numberOfOperations)
+    generateFaults(1)
+    assertEquals(1, circuit.numberOfCurrentFailures)
+    generateFaultsToOpen()
+    assertEquals(1, circuit.numberOfTimesOpened)
+    assertEquals(defaults.maxFailures, circuit.numberOfFailedOperations)
+  }
+
   // -- Helper methods ----------------------------------------------------------
   
   def reconfigureWith(
