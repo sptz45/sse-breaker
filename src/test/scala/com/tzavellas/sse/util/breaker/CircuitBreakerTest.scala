@@ -109,9 +109,8 @@ class CircuitBreakerTest {
   
   @Test
   def slow_metnod_executions_count_as_failures() {
-    for (i <- 0 until defaults.maxFailures)
-      makeSlowCall()
-    assertTrue("Should be open since the maxMethodDuration is to short", executor.breaker.isOpen)
+    for (i <- 0 until defaults.maxFailures) makeSlowCall()
+    assertTrue(circuit.isOpen)
   }
   
   // -- Helper methods ----------------------------------------------------------
