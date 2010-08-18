@@ -1,11 +1,9 @@
 package com.tzavellas.sse.util.breaker
 
 /**
- * Observes state changes of ciruit-breakers.
+ * Observes state changes of circuit-breakers.
  * 
- * <p>Tha API of this trait allows you to associate a single listener instance
- * with more that one circuit-breaker. If you do this then your implementations
- * must be <em>thread-safe</em>.</p> 
+ * <p>Implementations of this trait must be <em>thread-safe</em>.</p> 
  */
 trait CircuitStateChangeListener {
   
