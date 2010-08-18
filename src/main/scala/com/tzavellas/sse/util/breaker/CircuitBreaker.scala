@@ -61,8 +61,6 @@ class CircuitBreaker(
     timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
   }
   
-  def currentFailureCount = currentFailures.get
-  
   def close() {
     currentFailures.set(0)
     openTimestamp.set(0)
@@ -81,4 +79,9 @@ class CircuitBreaker(
   def reconfigure(newConf: CircuitConfiguration) {
     conf = newConf
   }
+  
+  def numberOfCurrentFailures = currentFailures.get
+  def numberOfFailedOperations = failures.get
+  def numberOfOperations = calls.get
+  def numberOfTimesOpened = timesOpened.get
 }

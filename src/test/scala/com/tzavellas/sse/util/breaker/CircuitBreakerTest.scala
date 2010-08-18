@@ -47,7 +47,7 @@ class CircuitBreakerTest {
     assertTrue("The circuit should have been half-open after the timeout", circuit.isHalfOpen)
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    assertEquals("From half-open to closed resets the current failures counter", 0, circuit.currentFailureCount)
+    assertEquals("From half-open to closed resets the current failures counter", 0, circuit.numberOfCurrentFailures)
   }
   
   @Test

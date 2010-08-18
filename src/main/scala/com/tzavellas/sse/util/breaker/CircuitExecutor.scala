@@ -27,7 +27,10 @@ package com.tzavellas.sse.util.breaker
  * 
  * <p>Instances of this class are thread-safe.</p>
  * 
- * @param configuration the configuration of the circuit-breaker.
+ * 
+ * @param circuitName     the name of the circuit-breaker.
+ * @param circuitConfig   the configuration of the circuit-breaker.
+ * @param circuitListener called when the state of the circuit-breaker changes.
  * 
  * @see CircuitBreaker
  * @see CircuitConfiguration
@@ -78,7 +81,8 @@ class CircuitExecutor(
    * circuit-breaker.
    * 
    * @param operation the operation to execute.
-   * @return the result of the operation execution
+   * 
+   * @return the result of the operation execution.
    * @throws OpenCircuitException if the circuit-breaker is open.
    */
   def apply[T](operation: => T): T = {
