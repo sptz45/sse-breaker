@@ -5,7 +5,7 @@
 	<artifactId>sse-breaker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<inceptionYear>2009</inceptionYear>
-	<name>Scala Circuit Breaker</name>
+	<name>Spiros Scala Experiments - Circuit-Breaker</name>
 	<description>An implementation of the Circuit Breaker stability design pattern in Scala</description>
 
 	<organization>
