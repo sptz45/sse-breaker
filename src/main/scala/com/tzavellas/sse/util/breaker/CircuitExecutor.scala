@@ -1,3 +1,4 @@
+
 /* ----------------- sse-breaker ----------------- *\
  * Licensed under the Apache License, Version 2.0. *
  * Author: Spiros Tzavellas                        *
@@ -76,9 +77,11 @@ class CircuitExecutor(
    * 
    * @param exception the exception to stop ignoring
    */
-  def removeIgnoredException[T <: Throwable](exception: Class[T]) {
+  def stopIgnoringException[T <: Throwable](exception: Class[T]) {
     ignoredExceptions -= exception
   }
+  
+  private[breaker] def ignoredExceptionsSeq = ignoredExceptions.toSeq
   
   /**
    * Executes the specified operation depending on the state of the
@@ -104,6 +107,23 @@ class CircuitExecutor(
         throw e
     }
   }
+  
+  /**
+   * Register a {@code CircuitBreakerControlMBean} for this executor in the
+   * platform MBean server. 
+   */
+  def exportToJmx() {
+    jmx.JmxRegistrar.register(this)
+  }
+  
+  /**
+   * Unregister the {@code CircuitBreakerControlMBean} that is associated with
+   * this executor from the platform MBean server.
+   */
+  def removeFromJmx() {
+    jmx.JmxRegistrar.unregister(this)
+  }
+  
   
   private def execute[T](operation: => T) = ExecutionTimer.time(operation) 
 

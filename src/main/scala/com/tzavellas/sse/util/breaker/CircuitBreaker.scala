@@ -84,8 +84,16 @@ class CircuitBreaker(
     conf = newConf
   }
   
+  def openedTimestamp = openTimestamp.get
+  
   def numberOfCurrentFailures = currentFailures.get
   def numberOfFailedOperations = failures.get
   def numberOfOperations = calls.get
   def numberOfTimesOpened = timesOpened.get
+  
+  def resetStatistics() {
+    failures.set(0)
+    calls.set(0)
+    timesOpened.set(0)
+  }
 }

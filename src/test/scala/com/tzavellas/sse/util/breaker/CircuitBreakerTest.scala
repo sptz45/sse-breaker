@@ -99,7 +99,7 @@ class CircuitBreakerTest {
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    executor.removeIgnoredException(classOf[IllegalStateException])
+    executor.stopIgnoringException(classOf[IllegalStateException])
   }
   
   @Test
@@ -108,7 +108,7 @@ class CircuitBreakerTest {
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    executor.removeIgnoredException(classOf[RuntimeException])
+    executor.stopIgnoringException(classOf[RuntimeException])
   }
   
   @Test

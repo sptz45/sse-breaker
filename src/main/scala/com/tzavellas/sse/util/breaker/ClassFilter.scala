@@ -39,5 +39,7 @@ private class ClassFilter {
   def -=(c: Class[_]) {
     classes = classes.filterNot(_ == c)
   }
+  
+  def toSeq: Seq[Class[_]] = classes
 }
 
