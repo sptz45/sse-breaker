@@ -9,7 +9,10 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
  * 
  * @see CircuitExecutor
  */
-class CircuitBreaker(initConf: CircuitConfiguration) {
+class CircuitBreaker(
+  val name: String,
+  initConf: CircuitConfiguration,
+  listener: CircuitStateChangeListener) {
   
   @volatile
   private[this] var conf = initConf
@@ -30,7 +33,7 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
     failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
-    if (conf.failureCountTimeout.hasPastSince(firstCurrentFailureTimestamp.get())) {
+    if (conf.failureCountTimeout.hasPastSince(firstCurrentFailureTimestamp.get)) {
       resetFailures()
       tmpCurrentFailures = 1
     } else {
@@ -42,35 +45,35 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
   
   private def resetFailures() {
     currentFailures.set(1)
-    firstCurrentFailureTimestamp.set(System.nanoTime())
+    firstCurrentFailureTimestamp.set(System.nanoTime)
   }
   
   private def initFirstFailureTimeStampIfNeeded() {
-    firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime())
+    firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime)
   }
 
   def isClosed = !isOpen
   
   def isOpen = currentFailures.get >= conf.maxFailures && !isHalfOpen
   
-  def isHalfOpen = hasExpired
+  def isHalfOpen = {
+    val timestampt = openTimestamp.get 
+    timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
+  }
   
   def currentFailureCount = currentFailures.get
-  
-  private def hasExpired = {
-    val timestampt = openTimestamp.get() 
-    timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis()
-  }
   
   def close() {
     currentFailures.set(0)
     openTimestamp.set(0)
+    listener.onClose(this)
   }
   
   def open() {
     timesOpened.incrementAndGet()
-    openTimestamp.set(System.currentTimeMillis())  
+    openTimestamp.set(System.currentTimeMillis)  
     currentFailures.set(conf.maxFailures)
+    listener.onOpen(this)
   }
 
   def configuration = conf
@@ -78,6 +81,4 @@ class CircuitBreaker(initConf: CircuitConfiguration) {
   def reconfigure(newConf: CircuitConfiguration) {
     conf = newConf
   }
-
 }
-

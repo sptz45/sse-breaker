@@ -33,12 +33,15 @@ package com.tzavellas.sse.util.breaker
  * @see CircuitConfiguration
  * @see OpenCircuitException
  */
-class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfiguration) {
+class CircuitExecutor(
+  circuitName: String,
+  circuitConfig: CircuitConfiguration = new CircuitConfiguration,
+  circuitListener: CircuitStateChangeListener = CircuitStateChangeListener.NULL) {
   
   private val ignoredExceptions = new ClassFilter
   
   /** The circuit-breaker of this executor. */
-  val breaker = new CircuitBreaker(configuration)
+  val circuitBreaker = new CircuitBreaker(circuitName, circuitConfig, circuitListener)
   
   /**
    * The duration after which a method execution is considered a failure.
@@ -79,7 +82,7 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
    * @throws OpenCircuitException if the circuit-breaker is open.
    */
   def apply[T](operation: => T): T = {
-    breaker.recordCall()
+    circuitBreaker.recordCall()
     assertTheCircuitIsClosed()
     try {
       val result = execute(operation)
@@ -97,12 +100,12 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
   private def execute[T](operation: => T) = ExecutionTimer.time(operation) 
 
   private def assertTheCircuitIsClosed() {
-    if (breaker.isOpen) throw new OpenCircuitException(breaker)
+    if (circuitBreaker.isOpen) throw new OpenCircuitException(circuitBreaker)
   }
   
   private def recordAsFailureIfItWasSlow(duration: Long) = {
     if (duration >= maxMethodDuration.toNanos) {
-      breaker.recordFailure()
+      circuitBreaker.recordFailure()
       false
     } else {
       true
@@ -110,12 +113,12 @@ class CircuitExecutor(configuration: CircuitConfiguration = new CircuitConfigura
   }
   
   private def closeTheCircuitIfItIsHalfOpen() {
-    if (breaker.isHalfOpen) breaker.close()
+    if (circuitBreaker.isHalfOpen) circuitBreaker.close()
   }
   
   private def recordIfNotIgnored(e: Throwable) {
     if (! ignoredExceptions.contains(e.getClass))
-      breaker.recordFailure()
+      circuitBreaker.recordFailure()
   }
 }
 

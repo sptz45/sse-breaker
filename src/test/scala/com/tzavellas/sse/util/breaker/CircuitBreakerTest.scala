@@ -6,8 +6,9 @@ import org.junit.Assert._
 class CircuitBreakerTest {
 
   val defaults = new CircuitConfiguration
-  val executor = new CircuitExecutor
-  def circuit  = executor.breaker
+  val listener = new TestListener
+  val executor = new CircuitExecutor("test-circuit", circuitListener = listener)
+  def circuit  = executor.circuitBreaker
   
   @Test
   def normal_operation_while_closed() {
@@ -21,7 +22,7 @@ class CircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_can_be_opened_after_being_closed() {
+  def the_circuit_can_be_closed_after_being_opened() {
     generateFaultsToOpen()
     try {
       makeNormalCall(circuitIsOpen=true)
@@ -113,13 +114,20 @@ class CircuitBreakerTest {
     assertTrue(circuit.isOpen)
   }
   
+  @Test
+  def circuit_listener_gets_called_when_the_circuits_state_changes() {
+    generateFaultsToOpen()
+    listener.assertCalledOnOpen()
+    circuit.close()
+    listener.assertCalledOnClose()
+  }
+  
   // -- Helper methods ----------------------------------------------------------
   
   def reconfigureWith(
     maxFailures: Int = defaults.maxFailures,
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
     failureCountTimeout: Duration = defaults.failureCountTimeout) {
-    val circuit = executor.breaker
     circuit.reconfigure(new CircuitConfiguration(maxFailures, openCircuitTimeout, failureCountTimeout))
   }
   
@@ -151,4 +159,21 @@ class CircuitBreakerTest {
   
   def normalOperation = 42 
   def faultyOperation = throw new IllegalStateException
+  
+  class TestListener extends CircuitStateChangeListener {
+    
+    var opened, closed: Boolean = false
+    
+    def onOpen(circuit: CircuitBreaker)  {
+      opened = true
+      assert(circuit.isOpen)
+    }
+    def onClose(circuit: CircuitBreaker) {
+      closed = true
+      assert(circuit.isClosed)
+    }
+    
+    def assertCalledOnOpen()  { assert(opened) }
+    def assertCalledOnClose() { assert(closed) }
+  }
 }
