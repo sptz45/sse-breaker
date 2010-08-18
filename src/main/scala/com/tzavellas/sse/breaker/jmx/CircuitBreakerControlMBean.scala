@@ -2,7 +2,7 @@
  * Licensed under the Apache License, Version 2.0. *
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
-package com.tzavellas.sse.util.breaker.jmx
+package com.tzavellas.sse.breaker.jmx
 
 import java.util.Date
 
