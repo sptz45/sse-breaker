@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tzavellas</groupId>
 	<artifactId>sse-breaker</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<inceptionYear>2009</inceptionYear>
 	<name>Spiros Scala Experiments - Circuit-Breaker</name>
 	<description>An implementation of the Circuit Breaker stability design pattern in Scala</description>
