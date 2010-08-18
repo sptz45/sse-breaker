@@ -1,4 +1,3 @@
-
 /* ----------------- sse-breaker ----------------- *\
  * Licensed under the Apache License, Version 2.0. *
  * Author: Spiros Tzavellas                        *
@@ -128,7 +127,7 @@ class CircuitExecutor(
   private def execute[T](operation: => T) = ExecutionTimer.time(operation) 
 
   private def assertTheCircuitIsClosed() {
-    if (circuitBreaker.isOpen) throw new OpenCircuitException(circuitBreaker)
+    if (circuitBreaker.isOpen) throw new OpenCircuitException(this)
   }
   
   private def recordAsFailureIfItWasSlow(duration: Long) = {

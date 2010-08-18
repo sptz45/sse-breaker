@@ -10,7 +10,9 @@ import scala.util.control.NoStackTrace
  * Thrown when a {@code CircuitExecutor} is requested to execute an operation
  * and its associated {@code CircuitBreaker} is <em>open</em>.
  *
- * @param circuit the {@code CirsuitBreaker} that is in the open state and
- *                caused this exception.
+ * @param circuitExecutor the {@code CirsuitExecutor} that threw this exception.
+ *        Can be used for manipulating and reconfiguring the circuit-breaker
  */
-class OpenCircuitException(val circuit: CircuitBreaker) extends RuntimeException with NoStackTrace
+class OpenCircuitException(val circuitExecutor: CircuitExecutor)
+  extends RuntimeException
+     with NoStackTrace

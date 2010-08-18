@@ -32,7 +32,7 @@ class CircuitBreakerTest {
       makeNormalCall(circuitIsOpen=true)
     } catch {
       case e: OpenCircuitException =>
-       val circuit = e.circuit
+       val circuit = e.circuitExecutor.circuitBreaker
        assertTrue("The circuit should be open after an OpenCircuitException", circuit.isOpen)
        circuit.close()
        assertFalse("The circuit should be closed after a call to close()", circuit.isOpen)
