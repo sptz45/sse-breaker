@@ -2,15 +2,15 @@
 # sse-breaker
 
 An implementation of the **Circuit Breaker** stability design pattern in the
-Scala programming language.
+*Scala* programming language.
 
 
 ## Usage
 
-To use the **Circuit Breaker**, all you need to do is instantiate a
+To use the *Circuit Breaker*, all you need to do is instantiate a
 `CircuitExecutor` with the appropriate configuration and call its `apply` method
 passing the closure containing the code with the high error rate (usually an
-**Integration Point**). If the circuit is *closed* or *half-open* then the
+*Integration Point*). If the circuit is *closed* or *half-open* then the
 executor will execute the closure else (if it is in the *open* state) the
 executor will throw an `OpenCircuitExeption` without executing the closure.
 
@@ -25,6 +25,7 @@ executor will throw an `OpenCircuitExeption` without executing the closure.
 
 For more information see the scaladoc of `CircuitExecutor`, `CircuitBreaker` and
 `CircuitConfiguration`.
+
 
 ## License
 
