@@ -26,20 +26,20 @@ class CircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_can_be_closed_after_being_opened() {
+  def the_circuit_can_be_closed_from_the_thrown_exception_data_after_opened() {
     generateFaultsToOpen()
     try {
       makeNormalCall(circuitIsOpen=true)
     } catch {
       case e: OpenCircuitException =>
-       val c = e.circuit
-       assertTrue("The circuit should be open after an OpenCircuitException", c.isOpen)
-       c.close()
-       assertFalse("The circuit should be closed after a call to close()", c.isOpen)
+       val circuit = e.circuit
+       assertTrue("The circuit should be open after an OpenCircuitException", circuit.isOpen)
+       circuit.close()
+       assertFalse("The circuit should be closed after a call to close()", circuit.isOpen)
        assertEquals(normalOperation, makeNormalCall())
        return
     }
-    fail("Should have raised an OpenCircuitException")
+    fail("The call to the open circuit should have raised an OpenCircuitException")
   }
   
   
@@ -80,18 +80,17 @@ class CircuitBreakerTest {
     reconfigureWith(failureCountTimeout = Duration.millis(1))
     generateFaults(defaults.maxFailures - 1)
     assertFalse(circuit.isOpen)
-    Thread.sleep(5)
+    Thread.sleep(2)
     generateFaults(1)
-    assertFalse("Must be open since the failure count must have been expired", circuit.isOpen)
+    assertTrue("Must be closed since the failure count must have been expired", circuit.isClosed)
     makeNormalCall()
   }
   
   @Test
-  def disable_breaker_by_setting_extremly_low_failure_count_timeout() {
+  def disable_breaker_by_setting_extremely_low_failure_count_timeout() {
     reconfigureWith(failureCountTimeout = Duration.nanos(1))  
     generateFaultsToOpen()
-    makeNormalCall()
-    assertFalse(circuit.isOpen)
+    assertTrue(circuit.isClosed)
   }
   
   @Test
@@ -99,7 +98,7 @@ class CircuitBreakerTest {
     executor.ignoreException(classOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
-    assertFalse(circuit.isOpen)
+    assertTrue(circuit.isClosed)
     executor.removeIgnoredException(classOf[IllegalStateException])
   }
   
@@ -108,7 +107,7 @@ class CircuitBreakerTest {
     executor.ignoreException(classOf[RuntimeException])
     generateFaultsToOpen()
     makeNormalCall()
-    assertFalse(circuit.isOpen)
+    assertTrue(circuit.isClosed)
     executor.removeIgnoredException(classOf[RuntimeException])
   }
   

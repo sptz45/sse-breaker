@@ -1,25 +1,30 @@
 
 # sse-breaker
 
-An implementation of the *Circuit Breaker* stability design pattern in the
+An implementation of the **Circuit Breaker** stability design pattern in the
 Scala programming language.
 
 
 ## Usage
 
-To use all you need to do is instantiate a `CircuitExecutor` with the
-appropriate configuration and call its `apply` method passing the closure
-containing the code with the high error rate (usually an *Integration Point*).
+To use the **Circuit Breaker**, all you need to do is instantiate a
+`CircuitExecutor` with the appropriate configuration and call its `apply` method
+passing the closure containing the code with the high error rate (usually an
+**Integration Point**). If the circuit is *closed* or *half-open* then the
+executor will execute the closure else (if it is in the *open* state) the
+executor will throw an `OpenCircuitExeption` without executing the closure.
 
 	class StocksService(stocks: StocksGateway) {
 	  
-	  val guard = new CircuitExecutor(name="stocks-breaker")
+	  val failFast = new CircuitExecutor(name="stocks-breaker")
 	
-	  def getQuote(ticker: String): Int = guard {
+	  def getQuote(ticker: String): Int = failFast {
 	    stocks.getQuote(ticker)
 	  }
 	}
 
+For more information see the scaladoc of `CircuitExecutor`, `CircuitBreaker` and
+`CircuitConfiguration`.
 
 ## License
 
