@@ -10,6 +10,10 @@ trait CircuitBreakerControlMBean {
   
   def getName: String
   
+  def isOpen: Boolean
+  def open()
+  def close()
+  
   def getMaxFailures: Int
   def setMaxFailures(max: Int)
   

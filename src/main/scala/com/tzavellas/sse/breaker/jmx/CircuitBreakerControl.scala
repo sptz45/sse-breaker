@@ -15,6 +15,10 @@ class CircuitBreakerControl(val executor: CircuitExecutor)
   
   def getName = circuit.name
   
+  def isOpen = circuit.isOpen
+  def open()  { circuit.open()  }
+  def close() { circuit.close() }
+  
   def getMaxFailures = config.maxFailures
   def setMaxFailures(max: Int) {
     circuit.reconfigure(config.copy(maxFailures=max))
