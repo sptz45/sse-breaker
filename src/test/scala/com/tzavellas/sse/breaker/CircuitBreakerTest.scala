@@ -138,8 +138,7 @@ class CircuitBreakerTest extends CircuitDriver {
     assertEquals(defaults.maxFailures, circuit.numberOfFailedOperations)
   }
 
-  // -- Helper methods ----------------------------------------------------------
-  
+
   class TestListener extends CircuitStateChangeListener {
     
     var opened, closed: Boolean = false
