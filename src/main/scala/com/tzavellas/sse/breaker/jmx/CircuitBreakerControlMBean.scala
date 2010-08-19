@@ -29,6 +29,8 @@ trait CircuitBreakerControlMBean {
   def getTotalOperations: Int
   def getNumberOfTimesOpened: Int
   
+  def resetStatistics()
+  
   def getMaxMethodDuration: String
   def setMaxMethodDuration(duration: String)
   

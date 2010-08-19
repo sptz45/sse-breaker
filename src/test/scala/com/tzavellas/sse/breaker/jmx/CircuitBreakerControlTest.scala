@@ -73,5 +73,9 @@ class CircuitBreakerControlTest extends CircuitDriver {
     assertEquals(circuit.numberOfFailedOperations, control.getFailedOperations)
     assertEquals(circuit.numberOfOperations, control.getTotalOperations)
     assertEquals(circuit.numberOfTimesOpened , control.getNumberOfTimesOpened )
+    control.resetStatistics()
+    assertEquals(0, control.getFailedOperations)
+    assertEquals(0, control.getTotalOperations)
+    assertEquals(0, control.getNumberOfTimesOpened)
   }
 }

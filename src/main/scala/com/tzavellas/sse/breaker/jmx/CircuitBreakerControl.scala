@@ -41,6 +41,10 @@ class CircuitBreakerControl(val executor: CircuitExecutor)
   def getFailedOperations = circuit.numberOfFailedOperations
   def getTotalOperations = circuit.numberOfOperations
   def getNumberOfTimesOpened = circuit.numberOfTimesOpened
+  
+  def resetStatistics() {
+    circuit.resetStatistics()
+  }
 
   def getMaxMethodDuration = executor.maxMethodDuration.toString
   def setMaxMethodDuration(duration: String) {

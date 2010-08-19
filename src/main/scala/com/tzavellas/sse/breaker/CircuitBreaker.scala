@@ -8,8 +8,13 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 
 /**
  * Holds the state of a circuit-breaker.
- *
+
  * <p>Instances of this class are thread-safe.</p>
+ * 
+ * @param name       the name of the circuit-breaker (used in the JMX
+ *                   {@code ObjectName}, can be used for logging, etc).
+ * @param initConfig the initial configuration of the circuit-breaker.
+ * @param listener   observes the state changes of this circuit-breaker.
  * 
  * @see CircuitExecutor
  */
@@ -55,22 +60,43 @@ class CircuitBreaker(
   private def initFirstFailureTimeStampIfNeeded() {
     firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime)
   }
-
-  def isClosed = !isOpen
   
+  /**
+   * Tests if the circuit-breaker is in the open state.
+   * 
+   * <p>A circuit-breaker is in the open state when enough failures have
+   * occurred in a configured amount of time and the opened state hasn't
+   * expired yet.<p>
+   */
   def isOpen = currentFailures.get >= conf.maxFailures && !isHalfOpen
   
+  /**
+   * Tests if the circuit-breaker is in the closed state.
+   * 
+   * <p>A circuit-breaker is in the closed state when it is not in the open
+   * state.</p>
+   */
+  def isClosed = !isOpen
+  
+  /**
+   * Tests if the circuit-breaker is in the half-open state.
+   * 
+   * <p>A circuit-breaker is in the half-open state when the open state has
+   * expired.</p>
+   */
   def isHalfOpen = {
     val timestampt = openTimestamp.get 
     timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
   }
   
+  /** Closes this circuit-breaker. */
   def close() {
     currentFailures.set(0)
     openTimestamp.set(0)
     listener.onClose(this)
   }
   
+  /** Opens this circuit-breaker. */
   def open() {
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
@@ -78,19 +104,44 @@ class CircuitBreaker(
     listener.onOpen(this)
   }
 
+  /** The current configuration. */
   def configuration = conf
   
+  /** Reconfigures this circuit-breaker using the specified configuration. */
   def reconfigure(newConf: CircuitConfiguration) {
     conf = newConf
   }
   
+  /**
+   * The timestamp of the last transition to the open state (zero when the
+   * circuit-breaker is in the closed state).
+   */
   def openedTimestamp = openTimestamp.get
   
+  /**
+   * The number of failures since the circuit breaker entered the closed
+   * state.
+   */
   def numberOfCurrentFailures = currentFailures.get
+  
+  /**
+   * The number of operations that threw an exception or took too long to
+   * complete.
+   */
   def numberOfFailedOperations = failures.get
+  
+  /** The number of operations (failed and successful). */
   def numberOfOperations = calls.get
+  
+  /** The number of times this circuit breaker has entered the open state. */
   def numberOfTimesOpened = timesOpened.get
   
+  /**
+   * Resets the statistics counters to zero.
+   * 
+   * <p>The values of {@code numberOfFailedOperations}, {@code numberOfOperations} and
+   * {@code numberOfTimesOpened} are set to zero.</p>
+   */
   def resetStatistics() {
     failures.set(0)
     calls.set(0)
