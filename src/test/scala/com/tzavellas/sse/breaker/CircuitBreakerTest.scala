@@ -7,12 +7,11 @@ package com.tzavellas.sse.breaker
 import org.junit.Test
 import org.junit.Assert._
 
-class CircuitBreakerTest {
+class CircuitBreakerTest extends CircuitDriver {
 
   val defaults = new CircuitConfiguration
   val listener = new TestListener
   val executor = new CircuitExecutor("test-circuit", circuitListener = listener)
-  def circuit  = executor.circuitBreaker
   
   @Test
   def normal_operation_while_closed() {
@@ -22,6 +21,8 @@ class CircuitBreakerTest {
   @Test(expected=classOf[OpenCircuitException])
   def after_a_number_of_faults_the_circuit_opens() {
     generateFaultsToOpen()
+    assertTrue(circuit.isOpen)
+    assertTrue(circuit.openedTimestamp != 0)
     makeNormalCall(circuitIsOpen=true)
   }
   
@@ -35,6 +36,7 @@ class CircuitBreakerTest {
        val circuit = e.circuitExecutor.circuitBreaker
        assertTrue("The circuit should be open after an OpenCircuitException", circuit.isOpen)
        circuit.close()
+       assertEquals(0, circuit.openedTimestamp)
        assertFalse("The circuit should be closed after a call to close()", circuit.isOpen)
        assertEquals(normalOperation, makeNormalCall())
        return
@@ -137,42 +139,6 @@ class CircuitBreakerTest {
   }
 
   // -- Helper methods ----------------------------------------------------------
-  
-  def reconfigureWith(
-    maxFailures: Int = defaults.maxFailures,
-    openCircuitTimeout: Duration = defaults.openCircuitTimeout,
-    failureCountTimeout: Duration = defaults.failureCountTimeout) {
-    circuit.reconfigure(new CircuitConfiguration(maxFailures, openCircuitTimeout, failureCountTimeout))
-  }
-  
-  def makeNormalCall(circuitIsOpen: Boolean = false) = {
-    try {
-      executor(normalOperation)
-    } catch {
-      case e: OpenCircuitException => 
-        if (circuitIsOpen) throw e
-        else throw new AssertionError("Unexpected OpenCircuitException!", e)
-    }
-  }
-  
-  def makeSlowCall() {
-    val previous = executor.maxMethodDuration 
-    executor.maxMethodDuration = Duration.nanos(1)
-    makeNormalCall()
-    executor.maxMethodDuration = previous
-  }
-  
-  def generateFaultsToOpen() {
-    generateFaults(defaults.maxFailures)
-  }
-  
-  def generateFaults(numOfFaults: Int) {
-    for (i <- 0 until numOfFaults)
-      try executor(faultyOperation) catch { case _ => () }
-  }
-  
-  def normalOperation = 42 
-  def faultyOperation = throw new IllegalStateException
   
   class TestListener extends CircuitStateChangeListener {
     

@@ -21,7 +21,7 @@ private[breaker] object JmxRegistrar {
   
   private def server = ManagementFactory.getPlatformMBeanServer
   
-  private def objectName(circuit: CircuitBreaker) = {
+  private[jmx] def objectName(circuit: CircuitBreaker) = {
     new ObjectName("com.tzavellas.sse.breaker:type=CircuitBreaker,name="+circuit.name)
   }
 }
