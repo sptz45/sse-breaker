@@ -37,7 +37,7 @@ trait CircuitDriver {
   }
   
   def generateFaultsToOpen() {
-    generateFaults(defaults.maxFailures)
+    generateFaults(config.maxFailures)
   }
   
   def generateFaults(numOfFaults: Int) {
