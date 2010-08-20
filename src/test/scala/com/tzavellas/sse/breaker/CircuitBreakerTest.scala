@@ -22,7 +22,7 @@ class CircuitBreakerTest extends CircuitDriver {
   def after_a_number_of_faults_the_circuit_opens() {
     generateFaultsToOpen()
     assertTrue(circuit.isOpen)
-    assertTrue(circuit.openedTimestamp != 0)
+    assertTrue(circuit.openedTimestamp > 0)
     makeNormalCall(circuitIsOpen=true)
   }
   
@@ -34,26 +34,33 @@ class CircuitBreakerTest extends CircuitDriver {
     } catch {
       case e: OpenCircuitException =>
        val circuit = e.circuitExecutor.circuitBreaker
-       assertTrue("The circuit should be open after an OpenCircuitException", circuit.isOpen)
+       assertTrue(circuit.isOpen)
        circuit.close()
        assertEquals(0, circuit.openedTimestamp)
-       assertFalse("The circuit should be closed after a call to close()", circuit.isOpen)
+       assertFalse(circuit.isOpen)
        assertEquals(normalOperation, makeNormalCall())
        return
     }
     fail("The call to the open circuit should have raised an OpenCircuitException")
   }
   
-  
   @Test
   def the_circuit_is_half_open_after_the_timeout() {
     reconfigureWith(openCircuitTimeout = Duration.millis(1))
     generateFaultsToOpen()
     Thread.sleep(2)
-    assertTrue("The circuit should have been half-open after the timeout", circuit.isHalfOpen)
+    assertTrue(circuit.isHalfOpen)
+  }
+  
+  @Test
+  def the_circuit_moves_from_half_open_to_closed_on_first_successful_operation() {
+    reconfigureWith(openCircuitTimeout = Duration.millis(1))
+    generateFaultsToOpen()
+    Thread.sleep(2)
+    assertTrue(circuit.isHalfOpen)
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    assertEquals("From half-open to closed resets the current failures counter", 0, circuit.numberOfCurrentFailures)
+    assertEquals(0, circuit.numberOfCurrentFailures)
   }
   
   @Test
@@ -81,10 +88,10 @@ class CircuitBreakerTest extends CircuitDriver {
   def the_failure_count_gets_reset_after_an_amount_of_time() {
     reconfigureWith(failureCountTimeout = Duration.millis(1))
     generateFaults(defaults.maxFailures - 1)
-    assertFalse(circuit.isOpen)
+    assertTrue(circuit.isClosed)
     Thread.sleep(2)
     generateFaults(1)
-    assertTrue("Must be closed since the failure count must have been expired", circuit.isClosed)
+    assertTrue(circuit.isClosed)
     makeNormalCall()
   }
   
