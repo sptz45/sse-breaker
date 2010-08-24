@@ -127,6 +127,13 @@ class CircuitBreakerTest extends CircuitDriver {
   }
   
   @Test
+  def non_local_returns_are_not_recorded_as_failures() {
+    for (i <- 0 until defaults.maxFailures)
+      makeCallWithNonLocalReturn()
+    assertTrue(circuit.isClosed)
+  }
+  
+  @Test
   def circuit_listener_gets_called_when_the_circuits_state_changes() {
     generateFaultsToOpen()
     listener.assertCalledOnOpen()

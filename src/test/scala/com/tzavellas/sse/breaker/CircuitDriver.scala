@@ -47,4 +47,6 @@ trait CircuitDriver {
   
   def normalOperation = 42 
   def faultyOperation = throw new IllegalStateException
+  
+  def makeCallWithNonLocalReturn(): Int = executor { return 43 }
 }

@@ -4,6 +4,8 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
+import scala.util.control.ControlThrowable
+
 /**
  * An executor that implements the Circuit Breaker stability design pattern.
  * 
@@ -101,6 +103,8 @@ class CircuitExecutor(
         closeTheCircuitIfItIsHalfOpen()
       result.value
     } catch {
+      case e: ControlThrowable => 
+        throw e 
       case e =>
         recordIfNotIgnored(e)
         throw e
