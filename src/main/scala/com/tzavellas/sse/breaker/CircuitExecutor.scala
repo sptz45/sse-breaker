@@ -4,8 +4,6 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
-import scala.util.control.ControlThrowable
-
 /**
  * An executor that implements the Circuit Breaker stability design pattern.
  * 
@@ -69,7 +67,7 @@ class CircuitExecutor(
    * 
    * @param ignored the exception to ignore
    */
-  def ignoreException[T <: Throwable](exception: Class[T]) {
+  def ignoreException[T <: Exception](exception: Class[T]) {
     ignoredExceptions += exception
   }
   
@@ -78,7 +76,7 @@ class CircuitExecutor(
    * 
    * @param exception the exception to stop ignoring
    */
-  def stopIgnoringException[T <: Throwable](exception: Class[T]) {
+  def stopIgnoringException[T <: Exception](exception: Class[T]) {
     ignoredExceptions -= exception
   }
   
@@ -103,9 +101,7 @@ class CircuitExecutor(
         closeTheCircuitIfItIsHalfOpen()
       result.value
     } catch {
-      case e: ControlThrowable => 
-        throw e 
-      case e =>
+      case e: Exception =>
         recordIfNotIgnored(e)
         throw e
     }

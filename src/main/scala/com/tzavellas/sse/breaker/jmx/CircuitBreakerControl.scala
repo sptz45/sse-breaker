@@ -54,12 +54,12 @@ class CircuitBreakerControl(val executor: CircuitExecutor)
   def getIgnoredExceptions = executor.ignoredExceptionsSeq.map(_.getName).mkString("\n") 
   
   def ignoreException(exceptionClass: String) {
-    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Throwable]]
+    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Exception]]
     executor.ignoreException(eclass)
   }
   
   def stopIgnoringException(exceptionClass: String) {
-    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Throwable]]
+    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Exception]]
     executor.stopIgnoringException(eclass)
   }
 }
