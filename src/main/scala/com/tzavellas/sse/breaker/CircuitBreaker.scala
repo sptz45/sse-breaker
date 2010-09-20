@@ -108,7 +108,7 @@ class CircuitBreaker(
   def configuration = conf
   
   /** Reconfigures this circuit-breaker using the specified configuration. */
-  def reconfigure(newConf: CircuitConfiguration) {
+  def reconfigureWith(newConf: CircuitConfiguration) {
     conf = newConf
   }
   

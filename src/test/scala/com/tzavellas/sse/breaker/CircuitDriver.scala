@@ -16,7 +16,11 @@ trait CircuitDriver {
     maxFailures: Int = defaults.maxFailures,
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
     failureCountTimeout: Duration = defaults.failureCountTimeout) {
-    circuit.reconfigure(new CircuitConfiguration(maxFailures, openCircuitTimeout, failureCountTimeout))
+    circuit.reconfigureWith(
+      new CircuitConfiguration(
+        maxFailures,
+        openCircuitTimeout,
+        failureCountTimeout))
   }
   
   def makeNormalCall(circuitIsOpen: Boolean = false) = {

@@ -21,18 +21,18 @@ class CircuitBreakerControl(val executor: CircuitExecutor)
   
   def getMaxFailures = config.maxFailures
   def setMaxFailures(max: Int) {
-    circuit.reconfigure(config.copy(maxFailures=max))
+    circuit.reconfigureWith(config.copy(maxFailures=max))
   }
   
   def getOpenCircuitTimeout = config.openCircuitTimeout.toString
   def setOpenCircuitTimeout(timeout: String) {
-    circuit.reconfigure(config.copy(openCircuitTimeout=Duration.valueOf(timeout)))
+    circuit.reconfigureWith(config.copy(openCircuitTimeout=Duration.valueOf(timeout)))
     
   }
   
   def getFailureCountTimeout = config.failureCountTimeout.toString
   def setFailureCountTimeout(timeout: String) {
-    circuit.reconfigure(config.copy(failureCountTimeout=Duration.valueOf(timeout)))
+    circuit.reconfigureWith(config.copy(failureCountTimeout=Duration.valueOf(timeout)))
   }
   
   def getOpenedTimestamp = new Date(circuit.openedTimestamp)

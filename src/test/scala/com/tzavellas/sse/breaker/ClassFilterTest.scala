@@ -9,7 +9,7 @@ import org.junit.Assert._
 
 class ClassFilterTest {
 
-  private val classes = new ClassFilter
+  private val classes: ClassFilter = new ClassFilter
   
   @Test
   def normal_operation() {
