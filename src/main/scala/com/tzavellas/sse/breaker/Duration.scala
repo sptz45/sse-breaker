@@ -11,9 +11,8 @@ import java.util.concurrent.TimeUnit._
 /**
  * A value object that holds a time duration in some {@link TimeUnit}.
  */
-@serializable
 @SerialVersionUID(515348490883208361L)
-sealed class Duration(val duration: Long, val unit: TimeUnit) {
+sealed class Duration(val duration: Long, val unit: TimeUnit) extends Serializable {
   
   def hasPastSince(nanos: Long) = 
     System.nanoTime - nanos >= toNanos
