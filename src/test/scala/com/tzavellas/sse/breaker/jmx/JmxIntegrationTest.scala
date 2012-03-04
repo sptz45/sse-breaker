@@ -13,14 +13,14 @@ import org.junit.Assert._
 class JmxIntegrationTest {
 
   val server = ManagementFactory.getPlatformMBeanServer
-  val executor = new CircuitExecutor("jmx-test") with JmxRegistrar
+  val executor = new CircuitExecutor("jmx-test") with CircuitJmxExporter
   def circuit = executor.circuitBreaker
   
   @Test
   def register_and_use_the_mbean() {
     executor.exportToJmx()
     val mbean = JMX.newMBeanProxy(server,
-                                  JmxRegistrar.objectName(circuit),
+                                  CircuitJmxExporter.objectName(circuit),
                                   classOf[CircuitBreakerControlMBean])
     assertTrue(circuit.isClosed)
     assertFalse(mbean.isOpen)
@@ -30,7 +30,7 @@ class JmxIntegrationTest {
     assertTrue(mbean.isOpen)
     
     executor.removeFromJmx()
-    val set = server.queryMBeans(JmxRegistrar.objectName(circuit), null)
+    val set = server.queryMBeans(CircuitJmxExporter.objectName(circuit), null)
     assertTrue(set.isEmpty)
   }
 }

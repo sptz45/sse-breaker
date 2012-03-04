@@ -8,11 +8,11 @@ package jmx
 import java.lang.management.ManagementFactory
 import javax.management._
 
-trait JmxRegistrar {
+trait CircuitJmxExporter {
   
   val circuitBreaker: CircuitBreaker
   
-  import JmxRegistrar._
+  import CircuitJmxExporter._
 
   /**
    * Register a {@code CircuitBreakerControlMBean} for this executor in the
@@ -34,7 +34,7 @@ trait JmxRegistrar {
   private def server = ManagementFactory.getPlatformMBeanServer
 }
 
-private [jmx] object JmxRegistrar {
+private [jmx] object CircuitJmxExporter {
   def objectName(circuit: CircuitBreaker) = {
     new ObjectName("com.tzavellas.sse.breaker:type=CircuitBreaker,name="+circuit.name)
   }  
