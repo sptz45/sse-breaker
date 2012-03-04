@@ -8,20 +8,34 @@ package jmx
 import java.lang.management.ManagementFactory
 import javax.management._
 
-private[breaker] object JmxRegistrar {
+trait JmxRegistrar {
+  
+  val circuitBreaker: CircuitBreaker
+  
+  import JmxRegistrar._
 
-  def register(executor: CircuitExecutor) {
-    val mbean = new CircuitBreakerControl(executor)
-    server.registerMBean(mbean, objectName(executor.circuitBreaker))
+  /**
+   * Register a {@code CircuitBreakerControlMBean} for this executor in the
+   * platform MBean server. 
+   */
+  def exportToJmx() {
+    val mbean = new CircuitBreakerControl(circuitBreaker)
+    server.registerMBean(mbean, objectName(circuitBreaker))
   }
   
-  def unregister(executor: CircuitExecutor) {
-    server.unregisterMBean(objectName(executor.circuitBreaker))
+  /**
+   * Unregister the {@code CircuitBreakerControlMBean} that is associated with
+   * this executor from the platform MBean server.
+   */
+  def removeFromJmx() {
+    server.unregisterMBean(objectName(circuitBreaker))
   }
   
   private def server = ManagementFactory.getPlatformMBeanServer
-  
-  private[jmx] def objectName(circuit: CircuitBreaker) = {
+}
+
+private [jmx] object JmxRegistrar {
+  def objectName(circuit: CircuitBreaker) = {
     new ObjectName("com.tzavellas.sse.breaker:type=CircuitBreaker,name="+circuit.name)
-  }
+  }  
 }

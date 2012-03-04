@@ -76,22 +76,6 @@ class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
         throw e
     }
   }
-  
-  /**
-   * Register a {@code CircuitBreakerControlMBean} for this executor in the
-   * platform MBean server. 
-   */
-  def exportToJmx() {
-    jmx.JmxRegistrar.register(this)
-  }
-  
-  /**
-   * Unregister the {@code CircuitBreakerControlMBean} that is associated with
-   * this executor from the platform MBean server.
-   */
-  def removeFromJmx() {
-    jmx.JmxRegistrar.unregister(this)
-  }
 
   private def assertTheCircuitIsClosed() {
     if (circuitBreaker.isOpen) throw new OpenCircuitException(this)

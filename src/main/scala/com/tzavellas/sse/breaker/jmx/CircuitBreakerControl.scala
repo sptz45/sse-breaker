@@ -7,10 +7,9 @@ package jmx
 
 import java.util.Date
 
-class CircuitBreakerControl(val executor: CircuitExecutor)
+class CircuitBreakerControl(val circuit: CircuitBreaker)
   extends CircuitBreakerControlMBean {
 
-  def circuit = executor.circuitBreaker
   def config = circuit.configuration
   
   def getName = circuit.name

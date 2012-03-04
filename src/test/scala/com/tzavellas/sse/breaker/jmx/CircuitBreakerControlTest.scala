@@ -12,8 +12,8 @@ import org.junit.Assert._
 class CircuitBreakerControlTest extends CircuitDriver {
 
   val defaults = new CircuitConfiguration
-  val executor = new CircuitExecutor("control-test")
-  val control  = new CircuitBreakerControl(executor)
+  val executor = new CircuitExecutor("control-test") with JmxRegistrar
+  val control  = new CircuitBreakerControl(circuit)
   
   
   @Test

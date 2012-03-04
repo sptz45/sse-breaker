@@ -13,7 +13,7 @@ import org.junit.Assert._
 class JmxIntegrationTest {
 
   val server = ManagementFactory.getPlatformMBeanServer
-  val executor = new CircuitExecutor("jmx-test")
+  val executor = new CircuitExecutor("jmx-test") with JmxRegistrar
   def circuit = executor.circuitBreaker
   
   @Test
