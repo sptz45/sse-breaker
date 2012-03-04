@@ -31,3 +31,7 @@ class ForcedOpenException(circuitName: String)
 
 
 class SlowMethodExecutionException(val maxMethodDuration: Duration) extends CircuitBreakerException
+
+
+class CircuitListenerException(name: String, action: String, cause: Throwable)
+  extends CircuitBreakerException("Error while invoking "+action+" on the listener of circuit "+name, cause)

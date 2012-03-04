@@ -108,7 +108,12 @@ class CircuitBreaker(
   def close() {
     currentFailures.set(0)
     openTimestamp.set(0)
-    listener.onClose(this)
+    try {
+      listener.onClose(this)
+    }
+    catch {
+      case e: Exception => throw new CircuitListenerException(name, "onClose", e) 
+    }
   }
   
   def open() {
@@ -120,7 +125,12 @@ class CircuitBreaker(
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
     currentFailures.set(conf.maxFailures)
-    listener.onOpen(this, failure)
+    try {
+      listener.onOpen(this, failure)
+    }
+    catch {
+      case e: Exception => throw new CircuitListenerException(name, "onOpen", e)
+    }
   }
 
   /** The current configuration. */
