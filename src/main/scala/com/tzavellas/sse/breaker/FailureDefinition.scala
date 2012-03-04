@@ -27,7 +27,4 @@ class FailureDefinition extends (Exception => Boolean) {
   def stopIgnoringException[T <: Exception](exception: Class[T]) {
     ignoredExceptions -= exception
   }
-  
-  private[breaker] def ignoredExceptionsSeq = ignoredExceptions.toSeq
-
 }
