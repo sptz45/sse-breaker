@@ -31,56 +31,26 @@ package com.tzavellas.sse.breaker
  * 
  * <p>Instances of this class are thread-safe.</p>
  * 
- * 
- * @param circuitName     the name of the circuit-breaker.
- * @param circuitConfig   the configuration of the circuit-breaker.
- * @param circuitListener called when the state of the circuit-breaker changes.
- * 
  * @see CircuitBreaker
  * @see CircuitConfiguration
  * @see OpenCircuitException
  */
-class CircuitExecutor(
-  circuitName: String,
-  circuitConfig: CircuitConfiguration = new CircuitConfiguration,
-  circuitListener: CircuitStateChangeListener = CircuitStateChangeListener.NULL) {
-  
-  private val ignoredExceptions = new ClassFilter
-  
-  /** The circuit-breaker of this executor. */
-  val circuitBreaker = new CircuitBreaker(circuitName, circuitConfig, circuitListener)
+class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
   
   /**
-   * The duration after which a method execution is considered a failure.
+   * Create an executor.
    * 
-   * <p>The default value is 1 minute.</p>
+   * @param circuitName     the name of the circuit-breaker.
+   * @param circuitConfig   the configuration of the circuit-breaker.
+   * @param circuitListener called when the state of the circuit-breaker changes.
    */
-  @volatile
-  var maxMethodDuration = Duration.minutes(1)
-  
-  /**
-   * When an exception of the specified type gets thrown as a result of an
-   * operation execution not increment the failure counter.
-   * 
-   * <p>Please note that subclasses of the specified exception will also
-   * be ignored.</p>
-   * 
-   * @param ignored the exception to ignore
-   */
-  def ignoreException[T <: Exception](exception: Class[T]) {
-    ignoredExceptions += exception
+  def this(
+    circuitName: String,
+    circuitConfig: CircuitConfiguration = new CircuitConfiguration,
+    circuitListener: CircuitStateChangeListener = CircuitStateChangeListener.empty
+  ) {
+    this(new CircuitBreaker(circuitName, circuitConfig, circuitListener))
   }
-  
-  /**
-   * Stop ignoring exceptions of the specified type when recording failures.
-   * 
-   * @param exception the exception to stop ignoring
-   */
-  def stopIgnoringException[T <: Exception](exception: Class[T]) {
-    ignoredExceptions -= exception
-  }
-  
-  private[breaker] def ignoredExceptionsSeq = ignoredExceptions.toSeq
   
   /**
    * Executes the specified operation depending on the state of the
@@ -95,14 +65,14 @@ class CircuitExecutor(
     circuitBreaker.recordCall()
     assertTheCircuitIsClosed()
     try {
-      val result = execute(operation)
-      val wasNotSlow = recordAsFailureIfItWasSlow(result.duration)
-      if (wasNotSlow)
-        closeTheCircuitIfItIsHalfOpen()
-      result.value
+      val start = System.nanoTime
+      val result = operation
+      val duration = System.nanoTime - start
+      circuitBreaker.recordExecutionTime(duration);
+      result
     } catch {
       case e: Exception =>
-        recordIfNotIgnored(e)
+        circuitBreaker.recordException(e)
         throw e
     }
   }
@@ -122,40 +92,8 @@ class CircuitExecutor(
   def removeFromJmx() {
     jmx.JmxRegistrar.unregister(this)
   }
-  
-  
-  private def execute[T](operation: => T) = ExecutionTimer.time(operation) 
 
   private def assertTheCircuitIsClosed() {
     if (circuitBreaker.isOpen) throw new OpenCircuitException(this)
-  }
-  
-  private def recordAsFailureIfItWasSlow(duration: Long) = {
-    if (duration >= maxMethodDuration.toNanos) {
-      circuitBreaker.recordFailure()
-      false
-    } else {
-      true
-    }
-  }
-  
-  private def closeTheCircuitIfItIsHalfOpen() {
-    if (circuitBreaker.isHalfOpen) circuitBreaker.close()
-  }
-  
-  private def recordIfNotIgnored(e: Throwable) {
-    if (! ignoredExceptions.contains(e.getClass))
-      circuitBreaker.recordFailure()
-  }
-}
-
-private object ExecutionTimer {
-  
-  def time[T](operation: => T) = {
-    val start = System.nanoTime()
-    new { 
-      val value = operation
-      val duration = System.nanoTime() - start
-    }
   }
 }

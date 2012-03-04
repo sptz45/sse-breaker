@@ -46,20 +46,8 @@ class CircuitBreakerControl(val executor: CircuitExecutor)
     circuit.resetStatistics()
   }
 
-  def getMaxMethodDuration = executor.maxMethodDuration.toString
+  def getMaxMethodDuration = config.maxMethodDuration.toString
   def setMaxMethodDuration(duration: String) {
-    executor.maxMethodDuration = Duration.valueOf(duration)
-  }
-  
-  def getIgnoredExceptions = executor.ignoredExceptionsSeq.map(_.getName).mkString("\n") 
-  
-  def ignoreException(exceptionClass: String) {
-    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Exception]]
-    executor.ignoreException(eclass)
-  }
-  
-  def stopIgnoringException(exceptionClass: String) {
-    val eclass = Class.forName(exceptionClass).asInstanceOf[Class[Exception]]
-    executor.stopIgnoringException(eclass)
+    circuit.reconfigureWith(config.copy(maxMethodDuration = Duration.valueOf(duration)))
   }
 }

@@ -9,9 +9,9 @@ import org.junit.Assert._
 
 class CircuitBreakerTest extends CircuitDriver {
 
-  val defaults = new CircuitConfiguration
+  val defaults = new CircuitConfiguration(isFailure = new FailureDefinition)
   val listener = new TestListener
-  val executor = new CircuitExecutor("test-circuit", circuitListener = listener)
+  val executor = new CircuitExecutor("test-circuit", defaults, listener)
   
   @Test
   def normal_operation_while_closed() {
@@ -104,20 +104,20 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def ignored_exceptions_do_not_open_the_circuit() {
-    executor.ignoreException(classOf[IllegalStateException])
+    ignoreException(classOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    executor.stopIgnoringException(classOf[IllegalStateException])
+    stopIgnoringException(classOf[IllegalStateException])
   }
   
   @Test
   def ignored_exceptions_capture_subclasses() {
-    executor.ignoreException(classOf[RuntimeException])
+    ignoreException(classOf[RuntimeException])
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    executor.stopIgnoringException(classOf[RuntimeException])
+    stopIgnoringException(classOf[RuntimeException])
   }
   
   @Test
@@ -151,14 +151,33 @@ class CircuitBreakerTest extends CircuitDriver {
     assertEquals(1, circuit.numberOfTimesOpened)
     assertEquals(defaults.maxFailures, circuit.numberOfFailedOperations)
   }
+  
+  @Test
+  def circuit_listener_receives_the_last_exception() {
+    generateFaultsToOpen()
+    assertTrue(listener.error.isInstanceOf[IllegalStateException])
+    circuit.close()
+    circuit.open()
+    assertTrue(listener.error.isInstanceOf[ForcedOpenException])
+  }
+  
+  
+  def ignoreException[E <: Exception](e: Class[E]) {
+    config.isFailure.asInstanceOf[FailureDefinition].ignoreException(e)
+  }
 
+  def stopIgnoringException[E <: Exception](e: Class[E]) {
+    config.isFailure.asInstanceOf[FailureDefinition].stopIgnoringException(e)
+  }
 
   class TestListener extends CircuitStateChangeListener {
     
     var opened, closed: Boolean = false
+    var error: Exception = _
     
-    def onOpen(circuit: CircuitBreaker)  {
+    def onOpen(circuit: CircuitBreaker, exception: Exception)  {
       opened = true
+      error = exception
       assert(circuit.isOpen)
     }
     def onClose(circuit: CircuitBreaker) {

@@ -38,7 +38,22 @@ class CircuitBreaker(
     calls.incrementAndGet()
   }
   
-  private[breaker] def recordFailure() {
+  private[breaker] def recordExecutionTime(nanos: Long) {
+    if (nanos > conf.maxMethodDuration.toNanos) {
+      recordFailure(new SlowMethodExecutionException(conf.maxMethodDuration))
+    }
+    else if (isHalfOpen) {
+      close()
+    }
+  }
+  
+  private [breaker] def recordException(exception: Exception) {
+    if (conf.isFailure(exception)) {
+      recordFailure(exception)
+    }
+  }
+  
+  private def recordFailure(failure: Exception) {
     failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
@@ -49,7 +64,7 @@ class CircuitBreaker(
       tmpCurrentFailures = currentFailures.incrementAndGet()
     }
     if (tmpCurrentFailures >= conf.maxFailures)
-        open()
+        open(failure)
   }
   
   private def resetFailures() {
@@ -96,12 +111,16 @@ class CircuitBreaker(
     listener.onClose(this)
   }
   
-  /** Opens this circuit-breaker. */
   def open() {
+    open(new ForcedOpenException(name))
+  }
+  
+  /** Opens this circuit-breaker. */
+  def open(failure: Exception) {
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
     currentFailures.set(conf.maxFailures)
-    listener.onOpen(this)
+    listener.onOpen(this, failure)
   }
 
   /** The current configuration. */

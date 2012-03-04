@@ -12,6 +12,7 @@ trait CircuitDriver {
   def circuit = executor.circuitBreaker
   def config  = circuit.configuration
   
+  
   def reconfigureWith(
     maxFailures: Int = defaults.maxFailures,
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
@@ -34,10 +35,10 @@ trait CircuitDriver {
   }
   
   def makeSlowCall() {
-    val previous = executor.maxMethodDuration 
-    executor.maxMethodDuration = Duration.nanos(1)
+    val previous = config.maxMethodDuration
+    circuit.reconfigureWith(config.copy(maxMethodDuration = Duration.nanos(1)))
     makeNormalCall()
-    executor.maxMethodDuration = previous
+    circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }
   
   def generateFaultsToOpen() {

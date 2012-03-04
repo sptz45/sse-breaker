@@ -49,21 +49,9 @@ class CircuitBreakerControlTest extends CircuitDriver {
     control.setFailureCountTimeout("10sec")
     assertEquals(Duration.seconds(10), config.failureCountTimeout)
     
-    assertEquals(executor.maxMethodDuration.toString, control.getMaxMethodDuration)
+    assertEquals(config.maxMethodDuration.toString, control.getMaxMethodDuration)
     control.setMaxMethodDuration("10sec")
-    assertEquals(Duration.seconds(10), executor.maxMethodDuration)
-  }
-  
-  @Test
-  def the_control_can_manipulate_ignored_exceptions() {
-    val ignored = "java.lang.IllegalStateException"
-    control.ignoreException(ignored)
-    generateFaultsToOpen()
-    assertTrue(circuit.isClosed)
-    assertEquals(ignored, control.getIgnoredExceptions)
-    control.stopIgnoringException(ignored)
-    generateFaultsToOpen()
-    assertTrue(circuit.isOpen)
+    assertEquals(Duration.seconds(10), config.maxMethodDuration)
   }
   
   @Test

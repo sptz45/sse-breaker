@@ -33,8 +33,4 @@ trait CircuitBreakerControlMBean {
   
   def getMaxMethodDuration: String
   def setMaxMethodDuration(duration: String)
-  
-  def getIgnoredExceptions: String
-  def ignoreException(exceptionClass: String)
-  def stopIgnoringException(exceptionClass: String)
 }
