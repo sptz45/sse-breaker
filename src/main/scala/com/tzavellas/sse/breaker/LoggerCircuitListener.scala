@@ -13,13 +13,13 @@ class LoggerCircuitListener(loggerName: String) extends CircuitStateListener {
     this(loggerName.getName)
   }
 
-  private val log = LoggerFactory.getLogger(loggerName);
+  private val log = LoggerFactory.getLogger(loggerName)
 
   def onOpen(breaker: CircuitBreaker, error: Exception) {
-    log.error("Opened the circuit with name " + breaker.name + "'", error);
+    log.error("Opened the circuit with name " + breaker.name + "'", error)
   }
 
   def onClose(breaker: CircuitBreaker) {
-    log.info("Closed the circuit with name '" + breaker.name + "'");
+    log.info("Closed the circuit with name '" + breaker.name + "'")
   }
 }
