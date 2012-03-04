@@ -20,7 +20,8 @@ class EmailCircuitListener(address: EmailAddress, config: SMTPConnectionConfig)
       body = "The system is back to normal")
   }
 
-  def sendEmail(subject: String, body: String) {
+
+  private def sendEmail(subject: String, body: String) {
     val session = Session.getInstance(new Properties)
     
     val message = new MimeMessage(session)
