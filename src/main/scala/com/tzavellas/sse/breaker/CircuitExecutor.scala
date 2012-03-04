@@ -47,7 +47,7 @@ class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
   def this(
     circuitName: String,
     circuitConfig: CircuitConfiguration = new CircuitConfiguration,
-    circuitListener: CircuitStateChangeListener = CircuitStateChangeListener.empty
+    circuitListener: CircuitStateListener = CircuitStateListener.empty
   ) {
     this(new CircuitBreaker(circuitName, circuitConfig, circuitListener))
   }

@@ -9,7 +9,7 @@ package com.tzavellas.sse.breaker
  * 
  * <p>Implementations of this trait must be <em>thread-safe</em>.</p> 
  */
-trait CircuitStateChangeListener {
+trait CircuitStateListener {
   
   /**
    * Called when a circuit-breaker moves into the <em>open</em> state.
@@ -27,16 +27,16 @@ trait CircuitStateChangeListener {
 }
 
 
-object CircuitStateChangeListener {
+object CircuitStateListener {
   
   /** A <em>null-object</em> implementation for CircuitStateChangeListener. */
-  object empty extends CircuitStateChangeListener {
+  object empty extends CircuitStateListener {
     def onOpen(circuit: CircuitBreaker, exception: Exception) { }
     def onClose(circuit: CircuitBreaker) { }
   }
   
-  def of(listeners: CircuitStateChangeListener*): CircuitStateChangeListener =
-    new CircuitStateChangeListener {
+  def of(listeners: CircuitStateListener*): CircuitStateListener =
+    new CircuitStateListener {
 	  def onOpen(circuit: CircuitBreaker, exception: Exception) {
 	    listeners foreach { _.onOpen(circuit, exception) }
 	  }

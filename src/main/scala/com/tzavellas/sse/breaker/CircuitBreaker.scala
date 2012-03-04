@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 class CircuitBreaker(
   val name: String,
   initConf: CircuitConfiguration,
-  listener: CircuitStateChangeListener) {
+  listener: CircuitStateListener) {
   
   @volatile
   private[this] var conf = initConf

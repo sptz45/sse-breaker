@@ -170,7 +170,7 @@ class CircuitBreakerTest extends CircuitDriver {
     config.isFailure.asInstanceOf[FailureDefinition].stopIgnoringException(e)
   }
 
-  class TestListener extends CircuitStateChangeListener {
+  class TestListener extends CircuitStateListener {
     
     var opened, closed: Boolean = false
     var error: Exception = _

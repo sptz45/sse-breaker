@@ -7,7 +7,7 @@ package com.tzavellas.sse.breaker
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class LoggerCircuitListener(loggerName: String) extends CircuitStateChangeListener {
+class LoggerCircuitListener(loggerName: String) extends CircuitStateListener {
 
   def this(loggerName: Class[_]) {
     this(loggerName.getName)
