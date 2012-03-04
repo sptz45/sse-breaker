@@ -3,7 +3,6 @@
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
-package jmx
 
 import java.util.Date
 import org.junit.Test

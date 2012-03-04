@@ -3,7 +3,6 @@
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
-package jmx
 
 import java.lang.management.ManagementFactory
 import javax.management._
@@ -34,7 +33,7 @@ trait CircuitJmxExporter {
   private def server = ManagementFactory.getPlatformMBeanServer
 }
 
-private [jmx] object CircuitJmxExporter {
+private [breaker] object CircuitJmxExporter {
   def objectName(circuit: CircuitBreaker) = {
     new ObjectName("com.tzavellas.sse.breaker:type=CircuitBreaker,name="+circuit.name)
   }  
