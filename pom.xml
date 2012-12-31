@@ -46,7 +46,7 @@
 
 	<properties>
 	   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	   <scala.version>2.9.1</scala.version>
+	   <scala.version>2.10.0</scala.version>
 	</properties>
 
 	<dependencies>
@@ -70,19 +70,17 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<sourceDirectory>src/main/scala</sourceDirectory>
-		<testSourceDirectory>src/test/scala</testSourceDirectory>
 		<plugins>
 			<plugin>
-				<groupId>org.scala-tools</groupId>
-				<artifactId>maven-scala-plugin</artifactId>
-				<version>2.15.2</version>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -90,20 +88,31 @@
 							<goal>testCompile</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>javadoc-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>doc-jar</goal>
+						</goals>
+					</execution>
 				</executions>
 				<configuration>
 					<scalaVersion>${scala.version}</scalaVersion>
+					<recompileMode>incremental</recompileMode>
+					<useZincServer>true</useZincServer>
 					<args>
-						<arg>-make:transitivenocp</arg>
-						<arg>-dependencyfile</arg>
-						<arg>${project.build.directory}/.scala_dependencies</arg>
+						<arg>-deprecation</arg>
+						<arg>-unchecked</arg>
+						<arg>-optimize</arg>
+						<arg>-encoding</arg>
+						<arg>${project.build.sourceEncoding}</arg>
 					</args>
 				</configuration>
 			</plugin>
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>2.4</version>
                 <configuration>
                     <archive>
                         <compress>true</compress>
@@ -115,7 +124,7 @@
             <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.1</version>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -126,42 +135,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<reportPlugins>
-						<plugin>
-							<groupId>org.scala-tools</groupId>
-							<artifactId>maven-scala-plugin</artifactId>
-							<version>2.15.2</version>
-							<configuration>
-								<scalaVersion>${scala.version}</scalaVersion>
-							</configuration>
-						</plugin>
-					</reportPlugins>
-				</configuration>
-			</plugin>
 		</plugins>
-		<extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>1.0</version>
-            </extension>
-        </extensions>
 	</build>
-
-	<distributionManagement>
-        <repository>
-            <id>tzavellas.com-repo</id>
-            <url>scp://www.tzavellas.com:90/home/spiros/public_html/maven/</url>
-        </repository>
-        <site>
-            <id>tzavellas.com-site</id>
-            <url>scp://www.tzavellas.com:90/home/spiros/public_html/projects/sse-breaker
-            </url>
-        </site>
-    </distributionManagement>
 </project>
