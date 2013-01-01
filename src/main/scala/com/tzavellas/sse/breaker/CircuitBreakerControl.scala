@@ -6,7 +6,7 @@ package com.tzavellas.sse.breaker
 
 import java.util.Date
 
-class CircuitBreakerControl(val circuit: CircuitBreaker)
+private class CircuitBreakerControl(val circuit: CircuitBreaker)
   extends CircuitBreakerControlMBean {
 
   def config = circuit.configuration

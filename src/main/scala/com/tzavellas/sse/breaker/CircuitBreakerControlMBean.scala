@@ -6,7 +6,7 @@ package com.tzavellas.sse.breaker
 
 import java.util.Date
 
-trait CircuitBreakerControlMBean {
+private trait CircuitBreakerControlMBean {
   
   def getName: String
   

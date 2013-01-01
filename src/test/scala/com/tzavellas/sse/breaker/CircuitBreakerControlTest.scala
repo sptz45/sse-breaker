@@ -12,7 +12,7 @@ class CircuitBreakerControlTest extends CircuitDriver {
 
   val defaults = new CircuitConfiguration
   val executor = new CircuitExecutor("control-test") with CircuitJmxExporter
-  val control  = new CircuitBreakerControl(circuit)
+  private val control  = new CircuitBreakerControl(circuit)
   
   
   @Test
