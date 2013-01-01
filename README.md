@@ -14,14 +14,17 @@ passing the closure containing the code with the high error rate (usually an
 executor will execute the closure else (if it is in the *open* state) the
 executor will throw an `OpenCircuitExeption` without executing the closure.
 
-	class StocksService(stocks: StocksGateway) {
-	  
-	  val failFast = new CircuitExecutor(name="stocks-breaker")
-	
-	  def getQuote(ticker: String): Int = failFast {
-	    stocks.getQuote(ticker)
-	  }
-	}
+```scala
+class StocksService(stocks: StocksGateway) {
+
+  val failFast = new CircuitExecutor(name="stocks-breaker")
+
+  def getQuote(ticker: String): Int = failFast {
+    stocks.getQuote(ticker)
+  }
+
+}
+```
 
 For more information see the scaladoc of `CircuitExecutor`, `CircuitBreaker` and
 `CircuitConfiguration`.
