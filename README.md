@@ -1,6 +1,8 @@
 
 # sse-breaker
 
+[![Build Status](https://secure.travis-ci.org/sptz45/sse-breaker.png)](http://travis-ci.org/sptz45/sse-breaker)
+
 An implementation of the **Circuit Breaker** stability design pattern in the
 *Scala* programming language.
 
