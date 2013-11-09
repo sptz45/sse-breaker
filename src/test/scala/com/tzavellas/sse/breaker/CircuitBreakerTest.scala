@@ -6,6 +6,7 @@ package com.tzavellas.sse.breaker
 
 import org.junit.Test
 import org.junit.Assert._
+import scala.concurrent.duration._
 
 class CircuitBreakerTest extends CircuitDriver {
 
@@ -46,7 +47,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_is_half_open_after_the_timeout() {
-    reconfigureWith(openCircuitTimeout = Duration.millis(1))
+    reconfigureWith(openCircuitTimeout = 1 milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -54,7 +55,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_moves_from_half_open_to_closed_on_first_successful_operation() {
-    reconfigureWith(openCircuitTimeout = Duration.millis(1))
+    reconfigureWith(openCircuitTimeout = 1 milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -65,7 +66,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_moves_from_half_open_to_open_on_first_failure() {
-    reconfigureWith(openCircuitTimeout = Duration.millis(1))
+    reconfigureWith(openCircuitTimeout = 1 milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -75,7 +76,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def slow_methods_do_not_close_the_circuit_when_half_open() {
-    reconfigureWith(openCircuitTimeout = Duration.millis(1))
+    reconfigureWith(openCircuitTimeout = 1 milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -86,7 +87,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_failure_count_gets_reset_after_an_amount_of_time() {
-    reconfigureWith(failureCountTimeout = Duration.millis(1))
+    reconfigureWith(failureCountTimeout = 1 milli)
     generateFaults(defaults.maxFailures - 1)
     assertTrue(circuit.isClosed)
     Thread.sleep(2)
@@ -97,7 +98,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def disable_breaker_by_setting_extremely_low_failure_count_timeout() {
-    reconfigureWith(failureCountTimeout = Duration.nanos(1))  
+    reconfigureWith(failureCountTimeout = 1 nano)
     generateFaultsToOpen()
     assertTrue(circuit.isClosed)
   }

@@ -5,6 +5,7 @@
 package com.tzavellas.sse.breaker
 
 import scala.util.control.NoStackTrace
+import scala.concurrent.duration.Duration
 
 /**
  * A base class for all circuit breaker exceptions. 

@@ -4,6 +4,8 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
+import scala.concurrent.duration._
+
 trait CircuitDriver {
   
   val defaults: CircuitConfiguration
@@ -36,7 +38,7 @@ trait CircuitDriver {
   
   def makeSlowCall() {
     val previous = config.maxMethodDuration
-    circuit.reconfigureWith(config.copy(maxMethodDuration = Duration.nanos(1)))
+    circuit.reconfigureWith(config.copy(maxMethodDuration = 1 nano))
     makeNormalCall()
     circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }

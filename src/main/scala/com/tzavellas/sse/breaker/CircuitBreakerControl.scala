@@ -5,6 +5,7 @@
 package com.tzavellas.sse.breaker
 
 import java.util.Date
+import scala.concurrent.duration.Duration
 
 private class CircuitBreakerControl(val circuit: CircuitBreaker)
   extends CircuitBreakerControlMBean {
@@ -24,13 +25,13 @@ private class CircuitBreakerControl(val circuit: CircuitBreaker)
   
   def getOpenCircuitTimeout = config.openCircuitTimeout.toString
   def setOpenCircuitTimeout(timeout: String) {
-    circuit.reconfigureWith(config.copy(openCircuitTimeout=Duration.valueOf(timeout)))
+    circuit.reconfigureWith(config.copy(openCircuitTimeout=Duration(timeout)))
     
   }
   
   def getFailureCountTimeout = config.failureCountTimeout.toString
   def setFailureCountTimeout(timeout: String) {
-    circuit.reconfigureWith(config.copy(failureCountTimeout=Duration.valueOf(timeout)))
+    circuit.reconfigureWith(config.copy(failureCountTimeout=Duration(timeout)))
   }
   
   def getOpenedTimestamp = new Date(circuit.openedTimestamp)
@@ -46,6 +47,6 @@ private class CircuitBreakerControl(val circuit: CircuitBreaker)
 
   def getMaxMethodDuration = config.maxMethodDuration.toString
   def setMaxMethodDuration(duration: String) {
-    circuit.reconfigureWith(config.copy(maxMethodDuration = Duration.valueOf(duration)))
+    circuit.reconfigureWith(config.copy(maxMethodDuration = Duration(duration)))
   }
 }

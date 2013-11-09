@@ -57,7 +57,7 @@ class CircuitBreaker(
     failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
-    if (conf.failureCountTimeout.hasPastSince(firstCurrentFailureTimestamp.get)) {
+    if (hasFailureCountExpired) {
       resetFailures()
       tmpCurrentFailures = 1
     } else {
@@ -76,6 +76,10 @@ class CircuitBreaker(
     firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime)
   }
   
+  private def hasFailureCountExpired() = {
+    System.nanoTime - firstCurrentFailureTimestamp.get >= conf.failureCountTimeout.toNanos
+  }
+
   /**
    * Tests if the circuit-breaker is in the open state.
    * 

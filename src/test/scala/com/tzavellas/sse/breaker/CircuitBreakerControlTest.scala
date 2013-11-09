@@ -7,6 +7,7 @@ package com.tzavellas.sse.breaker
 import java.util.Date
 import org.junit.Test
 import org.junit.Assert._
+import scala.concurrent.duration._
 
 class CircuitBreakerControlTest extends CircuitDriver {
 
@@ -42,15 +43,15 @@ class CircuitBreakerControlTest extends CircuitDriver {
     
     assertEquals(config.openCircuitTimeout.toString, control.getOpenCircuitTimeout)
     control.setOpenCircuitTimeout("30sec")
-    assertEquals(Duration.seconds(30), config.openCircuitTimeout)
+    assertEquals(30 seconds, config.openCircuitTimeout)
     
     assertEquals(config.failureCountTimeout.toString, control.getFailureCountTimeout)
     control.setFailureCountTimeout("10sec")
-    assertEquals(Duration.seconds(10), config.failureCountTimeout)
+    assertEquals(10 seconds, config.failureCountTimeout)
     
     assertEquals(config.maxMethodDuration.toString, control.getMaxMethodDuration)
     control.setMaxMethodDuration("10sec")
-    assertEquals(Duration.seconds(10), config.maxMethodDuration)
+    assertEquals(10 seconds, config.maxMethodDuration)
   }
   
   @Test

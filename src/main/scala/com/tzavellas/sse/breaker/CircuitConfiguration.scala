@@ -4,6 +4,8 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
+import scala.concurrent.duration._
+
 /**
  * Holds configuration data for the circuit-breaker.
  *
@@ -20,8 +22,8 @@ package com.tzavellas.sse.breaker
  */
 case class CircuitConfiguration(
     maxFailures: Int = 5,
-    openCircuitTimeout: Duration = Duration.minutes(10),
-    failureCountTimeout: Duration = Duration.minutes(1),
+    openCircuitTimeout: Duration = 10 minutes,
+    failureCountTimeout: Duration = 1 minute,
     isFailure: Exception => Boolean = _ => true,
-    maxMethodDuration: Duration = Duration.minutes(1))
+    maxMethodDuration: Duration =  1 minute)
 
