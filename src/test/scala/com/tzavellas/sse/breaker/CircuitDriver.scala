@@ -47,7 +47,7 @@ trait CircuitDriver {
   
   def generateFaults(numOfFaults: Int) {
     for (i <- 0 until numOfFaults)
-      try executor(faultyOperation) catch { case _ => () }
+      try executor(faultyOperation) catch { case _: Exception => () }
   }
   
   def normalOperation = 42 
