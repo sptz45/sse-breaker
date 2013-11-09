@@ -14,8 +14,8 @@ class FailureDefinition extends (Exception => Boolean) {
    * When an exception of the specified type gets thrown as a result of an
    * operation execution not increment the failure counter.
    * 
-   * <p>Please note that subclasses of the specified exception will also
-   * be ignored.</p>
+   * Please note that subclasses of the specified exception will also
+   * be ignored.
    * 
    * @param ignored the exception to ignore
    */

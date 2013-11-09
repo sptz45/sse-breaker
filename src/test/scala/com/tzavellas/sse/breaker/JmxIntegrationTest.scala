@@ -19,7 +19,7 @@ class JmxIntegrationTest {
   def register_and_use_the_mbean() {
     executor.exportToJmx()
     val mbean = JMX.newMBeanProxy(server,
-                                  CircuitJmxExporter.objectName(circuit),
+                                  CircuitJmxExporter.objectNameOf(circuit),
                                   classOf[CircuitBreakerControlMBean])
     assertTrue(circuit.isClosed)
     assertFalse(mbean.isOpen)
@@ -29,7 +29,7 @@ class JmxIntegrationTest {
     assertTrue(mbean.isOpen)
     
     executor.removeFromJmx()
-    val set = server.queryMBeans(CircuitJmxExporter.objectName(circuit), null)
+    val set = server.queryMBeans(CircuitJmxExporter.objectNameOf(circuit), null)
     assertTrue(set.isEmpty)
   }
 }

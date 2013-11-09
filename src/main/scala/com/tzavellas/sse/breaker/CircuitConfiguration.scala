@@ -12,7 +12,7 @@ import scala.concurrent.duration._
  * @param maxFailures         the number of failures that must occur to open the
  *                            circuit.
  * @param openCircuitTimeout  the duration after which the circuit-breaker moves
- *                            to the <em>half-open</em> state.
+ *                            to the ''half-open'' state.
  * @param failureCountTimeout the duration after which the number of failures
  *                            will get reset.
  * @param isFailure           a function that decides whether to recored a thrown

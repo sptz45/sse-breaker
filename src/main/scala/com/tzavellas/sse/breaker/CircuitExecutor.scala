@@ -7,30 +7,34 @@ package com.tzavellas.sse.breaker
 /**
  * An executor that implements the Circuit Breaker stability design pattern.
  * 
- * <p>The purpose of the a circuit-breaker is to keep track of the error rates
+ * The purpose of the a circuit-breaker is to keep track of the error rates
  * of dangerous operations (such as calls to an integration point) and prevent
  * the execution of those operations for a configurable amount of time when the
- * error rates are high. A circuit-breaker has three states: <em>closed</em>,
- * <em>open</em> and <em>half-open</em>.
+ * error rates are high. A circuit-breaker has three states: ''closed'',
+ * ''open'' and ''half-open''.
  * 
- * <p>During normal operation the circuit-breaker is <em>closed</em> and the
+ * During normal operation the circuit-breaker is ''closed'' and the
  * executor executes the specified operation, recording the number of failures
  * (exceptions thrown) that happen as a result of those executions. When the
  * number of failures exceeds a configured number then the circuit-breaker moves
- * to the <em>open</em> state.</p> 
+ * to the ''open'' state.
  * 
- * <p>In the <em>open</em> state, since the probability that failures will happen
- * is high, the executor when requested to execute an operation <em>fails fast</em>
- * by throwing an {@code OpenCircuitException}.</p>
+ * In the ''open'' state, since the probability that failures will happen
+ * is high, the executor when requested to execute an operation ''fails fast''
+ * by throwing an `OpenCircuitException`.
  * 
- * <p>After a configurable amount of time the circuit-breaker goes to the
- * <em>half-open</em> state. In that state when a request to execute an operation
+ * After a configurable amount of time the circuit-breaker goes to the
+ * ''half-open'' state. In that state when a request to execute an operation
  * is made, the executor executes the operation and if it succeeds the
- * circuit-breaker moves to the <em>closed</em> state, else it moves to the
- * <em>open</em> state.</p>
+ * circuit-breaker moves to the ''closed'' state, else it moves to the
+ * ''open'' state.
  * 
- * <p>Instances of this class are thread-safe.</p>
- * 
+ * Instances of this class are ''thread-safe''.
+ *
+ * @constructor Creates an executor for the specified circuit-breaker.
+ *
+ * @param circuitBreaker the circuit-breaker of the executor.
+ *
  * @see CircuitBreaker
  * @see CircuitConfiguration
  * @see OpenCircuitException

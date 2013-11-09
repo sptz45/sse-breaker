@@ -7,19 +7,19 @@ package com.tzavellas.sse.breaker
 /**
  * Observes state changes of circuit-breakers.
  * 
- * <p>Implementations of this trait must be <em>thread-safe</em>.</p> 
+ * Implementations of this trait must be ''thread-safe''. 
  */
 trait CircuitStateListener {
   
   /**
-   * Called when a circuit-breaker moves into the <em>open</em> state.
+   * Called when a circuit-breaker moves into the ''open'' state.
    * 
    * @param circuit the circuit-breaker that got opened
    */
   def onOpen(circuit: CircuitBreaker, exception: Exception)
   
   /**
-   * Called when a circuit-breaker moves into the <em>closed</em> state.
+   * Called when a circuit-breaker moves into the ''closed'' state.
    * 
    * @param circuit the circuit-breaker that got closed
    */
@@ -29,13 +29,13 @@ trait CircuitStateListener {
 
 object CircuitStateListener {
   
-  /** A <em>null-object</em> implementation for CircuitStateChangeListener. */
+  /** A ''null object'' implementation for CircuitStateChangeListener. */
   object empty extends CircuitStateListener {
     def onOpen(circuit: CircuitBreaker, exception: Exception) { }
     def onClose(circuit: CircuitBreaker) { }
   }
   
-  def of(listeners: CircuitStateListener*): CircuitStateListener =
+  def of(listeners: CircuitStateListener*): CircuitStateListener = {
     new CircuitStateListener {
 	  def onOpen(circuit: CircuitBreaker, exception: Exception) {
 	    listeners foreach { _.onOpen(circuit, exception) }
@@ -44,4 +44,5 @@ object CircuitStateListener {
 	    listeners foreach { _.onClose(circuit) }
 	  }
 	}
+  }
 }

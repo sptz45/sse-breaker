@@ -26,7 +26,6 @@ private class CircuitBreakerControl(val circuit: CircuitBreaker)
   def getOpenCircuitTimeout = config.openCircuitTimeout.toString
   def setOpenCircuitTimeout(timeout: String) {
     circuit.reconfigureWith(config.copy(openCircuitTimeout=Duration(timeout)))
-    
   }
   
   def getFailureCountTimeout = config.failureCountTimeout.toString

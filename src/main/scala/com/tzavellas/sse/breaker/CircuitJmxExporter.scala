@@ -14,27 +14,27 @@ trait CircuitJmxExporter {
   import CircuitJmxExporter._
 
   /**
-   * Register a {@code CircuitBreakerControlMBean} for this executor in the
-   * platform MBean server. 
+   * Register a `CircuitBreakerControlMBean` for this executor in the platform
+   * MBean server.
    */
   def exportToJmx() {
     val mbean = new CircuitBreakerControl(circuitBreaker)
-    server.registerMBean(mbean, objectName(circuitBreaker))
+    server.registerMBean(mbean, objectNameOf(circuitBreaker))
   }
   
   /**
-   * Unregister the {@code CircuitBreakerControlMBean} that is associated with
-   * this executor from the platform MBean server.
+   * Unregister the `CircuitBreakerControlMBean` that is associated with this
+   * executor from the platform MBean server.
    */
   def removeFromJmx() {
-    server.unregisterMBean(objectName(circuitBreaker))
+    server.unregisterMBean(objectNameOf(circuitBreaker))
   }
   
   private def server = ManagementFactory.getPlatformMBeanServer
 }
 
-private [breaker] object CircuitJmxExporter {
-  def objectName(circuit: CircuitBreaker) = {
+private object CircuitJmxExporter {
+  def objectNameOf(circuit: CircuitBreaker) = {
     new ObjectName("com.tzavellas.sse.breaker:type=CircuitBreaker,name="+circuit.name)
   }  
 }

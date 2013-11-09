@@ -9,11 +9,11 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 /**
  * Holds the state of a circuit-breaker.
 
- * <p>Instances of this class are thread-safe.</p>
+ * Instances of this class are ''thread-safe''.
  * 
  * @param name       the name of the circuit-breaker (used in the JMX
- *                   {@code ObjectName}, can be used for logging, etc).
- * @param initConfig the initial configuration of the circuit-breaker.
+ *                   `ObjectName`, can be used for logging, etc).
+ * @param initConf   the initial configuration of the circuit-breaker.
  * @param listener   observes the state changes of this circuit-breaker.
  * 
  * @see CircuitExecutor

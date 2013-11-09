@@ -14,11 +14,12 @@ class CircuitBreakerException(message: String = null, cause: Throwable = null)
   extends RuntimeException(message, cause)
 
 /**
- * Thrown when a {@code CircuitExecutor} is requested to execute an operation
- * and its associated {@code CircuitBreaker} is <em>open</em>.
+ * Thrown when a `CircuitExecutor` is requested to execute an operation
+ * and its associated `CircuitBreaker` is ''open''.
  *
- * @param circuitExecutor the {@code CirsuitExecutor} that threw this exception.
- *        Can be used for manipulating and reconfiguring the circuit-breaker
+ * @param circuitExecutor the `CirsuitExecutor` that threw this exception. Can
+ *                        be used for manipulating and reconfiguring the circuit
+ *                        breaker.
  */
 class OpenCircuitException(val circuitExecutor: CircuitExecutor)
   extends CircuitBreakerException(
@@ -26,13 +27,18 @@ class OpenCircuitException(val circuitExecutor: CircuitExecutor)
       circuitExecutor.circuitBreaker.name + "' is open!")
     with NoStackTrace
 
-
-class ForcedOpenException(circuitName: String)
-  extends CircuitBreakerException("Ciruit '"+circuitName+"' opened after user's request.")
-
-
-class SlowMethodExecutionException(val maxMethodDuration: Duration) extends CircuitBreakerException
-
-
+/**
+ * Wraps exceptions thrown from `CircuitStateListener` implementations.
+ */
 class CircuitListenerException(name: String, action: String, cause: Throwable)
-  extends CircuitBreakerException("Error while invoking "+action+" on the listener of circuit "+name, cause)
+  extends CircuitBreakerException(s"Error while invoking ${action} on the listener of circuit '${name}'", cause)
+
+
+// -- internal exceptions -----------------------------------------------------
+
+private class ForcedOpenException(circuitName: String)
+  extends CircuitBreakerException(s"Circuit '${circuitName}' opened after user's request.")
+
+
+private class SlowMethodExecutionException(val maxMethodDuration: Duration) extends CircuitBreakerException
+
