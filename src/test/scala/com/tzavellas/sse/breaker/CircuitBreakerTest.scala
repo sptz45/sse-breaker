@@ -10,7 +10,6 @@ import scala.concurrent.duration._
 
 class CircuitBreakerTest extends CircuitDriver {
 
-  val defaults = new CircuitConfiguration(isFailure = new FailureDefinition)
   val listener = new TestListener
   val executor = new CircuitExecutor("test-circuit", defaults, listener)
   
@@ -47,7 +46,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_is_half_open_after_the_timeout() {
-    reconfigureWith(openCircuitTimeout = 1 milli)
+    reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -55,7 +54,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_moves_from_half_open_to_closed_on_first_successful_operation() {
-    reconfigureWith(openCircuitTimeout = 1 milli)
+    reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -66,7 +65,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_circuit_moves_from_half_open_to_open_on_first_failure() {
-    reconfigureWith(openCircuitTimeout = 1 milli)
+    reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -76,7 +75,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def slow_methods_do_not_close_the_circuit_when_half_open() {
-    reconfigureWith(openCircuitTimeout = 1 milli)
+    reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
     assertTrue(circuit.isHalfOpen)
@@ -87,7 +86,7 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def the_failure_count_gets_reset_after_an_amount_of_time() {
-    reconfigureWith(failureCountTimeout = 1 milli)
+    reconfigureWith(failureCountTimeout = 1.milli)
     generateFaults(defaults.maxFailures - 1)
     assertTrue(circuit.isClosed)
     Thread.sleep(2)
@@ -98,27 +97,29 @@ class CircuitBreakerTest extends CircuitDriver {
   
   @Test
   def disable_breaker_by_setting_extremely_low_failure_count_timeout() {
-    reconfigureWith(failureCountTimeout = 1 nano)
+    reconfigureWith(failureCountTimeout = 1.nano)
     generateFaultsToOpen()
     assertTrue(circuit.isClosed)
   }
   
   @Test
   def ignored_exceptions_do_not_open_the_circuit() {
-    ignoreException(classOf[IllegalStateException])
+    val failureDefinition = new FailureDefinition
+    reconfigureWith(isFailure = failureDefinition)
+    failureDefinition.ignoreException(classOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    stopIgnoringException(classOf[IllegalStateException])
   }
   
   @Test
   def ignored_exceptions_capture_subclasses() {
-    ignoreException(classOf[RuntimeException])
+    val failureDefinition = new FailureDefinition
+    reconfigureWith(isFailure = failureDefinition)
+    failureDefinition.ignoreException(classOf[RuntimeException])
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
-    stopIgnoringException(classOf[RuntimeException])
   }
   
   @Test
@@ -163,13 +164,6 @@ class CircuitBreakerTest extends CircuitDriver {
   }
   
   
-  def ignoreException[E <: Exception](e: Class[E]) {
-    config.isFailure.asInstanceOf[FailureDefinition].ignoreException(e)
-  }
-
-  def stopIgnoringException[E <: Exception](e: Class[E]) {
-    config.isFailure.asInstanceOf[FailureDefinition].stopIgnoringException(e)
-  }
 
   class TestListener extends CircuitStateListener {
     

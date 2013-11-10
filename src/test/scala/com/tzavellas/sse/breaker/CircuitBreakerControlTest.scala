@@ -11,8 +11,7 @@ import scala.concurrent.duration._
 
 class CircuitBreakerControlTest extends CircuitDriver {
 
-  val defaults = new CircuitConfiguration
-  val executor = new CircuitExecutor("control-test") with CircuitJmxExporter
+  val executor = new CircuitExecutor("control-test", defaults) with CircuitJmxExporter
   private val control  = new CircuitBreakerControl(circuit)
   
   
@@ -43,15 +42,15 @@ class CircuitBreakerControlTest extends CircuitDriver {
     
     assertEquals(config.openCircuitTimeout.toString, control.getOpenCircuitTimeout)
     control.setOpenCircuitTimeout("30sec")
-    assertEquals(30 seconds, config.openCircuitTimeout)
+    assertEquals(30.seconds, config.openCircuitTimeout)
     
     assertEquals(config.failureCountTimeout.toString, control.getFailureCountTimeout)
     control.setFailureCountTimeout("10sec")
-    assertEquals(10 seconds, config.failureCountTimeout)
+    assertEquals(10.seconds, config.failureCountTimeout)
     
     assertEquals(config.maxMethodDuration.toString, control.getMaxMethodDuration)
     control.setMaxMethodDuration("10sec")
-    assertEquals(10 seconds, config.maxMethodDuration)
+    assertEquals(10.seconds, config.maxMethodDuration)
   }
   
   @Test

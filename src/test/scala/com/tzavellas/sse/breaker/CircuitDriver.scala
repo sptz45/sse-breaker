@@ -8,9 +8,9 @@ import scala.concurrent.duration._
 
 trait CircuitDriver {
   
-  val defaults: CircuitConfiguration
+  val defaults = DefaultTestConfiguration
   val executor: CircuitExecutor
-  
+
   def circuit = executor.circuitBreaker
   def config  = circuit.configuration
   
@@ -18,12 +18,16 @@ trait CircuitDriver {
   def reconfigureWith(
     maxFailures: Int = defaults.maxFailures,
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
-    failureCountTimeout: Duration = defaults.failureCountTimeout) {
+    failureCountTimeout: Duration = defaults.failureCountTimeout,
+    maxMethodDuration: Duration = defaults.maxMethodDuration,
+    isFailure: Exception => Boolean = defaults.isFailure) {
     circuit.reconfigureWith(
       new CircuitConfiguration(
         maxFailures,
         openCircuitTimeout,
-        failureCountTimeout))
+        failureCountTimeout,
+        maxMethodDuration,
+        isFailure))
   }
   
   def makeNormalCall(circuitIsOpen: Boolean = false) = {
@@ -38,7 +42,7 @@ trait CircuitDriver {
   
   def makeSlowCall() {
     val previous = config.maxMethodDuration
-    circuit.reconfigureWith(config.copy(maxMethodDuration = 1 nano))
+    circuit.reconfigureWith(config.copy(maxMethodDuration = 1.nano))
     makeNormalCall()
     circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }

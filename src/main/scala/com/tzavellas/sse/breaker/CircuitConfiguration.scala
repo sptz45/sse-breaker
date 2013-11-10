@@ -21,9 +21,9 @@ import scala.concurrent.duration._
  *                            considered a failure.
  */
 case class CircuitConfiguration(
-    maxFailures: Int = 5,
-    openCircuitTimeout: Duration = 10 minutes,
-    failureCountTimeout: Duration = 1 minute,
-    isFailure: Exception => Boolean = _ => true,
-    maxMethodDuration: Duration =  1 minute)
+    maxFailures: Int,
+    openCircuitTimeout: Duration,
+    failureCountTimeout: Duration,
+    maxMethodDuration: Duration,
+    isFailure: Exception => Boolean = _ => true)
 

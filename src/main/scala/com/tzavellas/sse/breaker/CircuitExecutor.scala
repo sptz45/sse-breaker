@@ -50,7 +50,7 @@ class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
    */
   def this(
     circuitName: String,
-    circuitConfig: CircuitConfiguration = new CircuitConfiguration,
+    circuitConfig: CircuitConfiguration,
     circuitListener: CircuitStateListener = CircuitStateListener.empty
   ) {
     this(new CircuitBreaker(circuitName, circuitConfig, circuitListener))
