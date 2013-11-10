@@ -2,11 +2,13 @@
  * Licensed under the Apache License, Version 2.0. *
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
-package com.tzavellas.sse.breaker
+package com.tzavellas.sse.breaker.extras
 
 import java.util.Properties
 import javax.mail.internet.{ InternetAddress, MimeMessage }
 import javax.mail.{ Message, Session, Transport }
+import com.tzavellas.sse.breaker.CircuitBreaker
+import com.tzavellas.sse.breaker.CircuitStateListener
 
 class EmailCircuitListener(address: EmailAddress, config: SMTPConnectionConfig)
   extends CircuitStateListener {

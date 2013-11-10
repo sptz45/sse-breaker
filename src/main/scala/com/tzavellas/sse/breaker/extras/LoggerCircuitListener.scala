@@ -2,10 +2,10 @@
  * Licensed under the Apache License, Version 2.0. *
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
-package com.tzavellas.sse.breaker
-
-import org.slf4j.Logger;
+package com.tzavellas.sse.breaker.extras
 import org.slf4j.LoggerFactory;
+import com.tzavellas.sse.breaker.CircuitBreaker
+import com.tzavellas.sse.breaker.CircuitStateListener
 
 class LoggerCircuitListener(loggerName: String) extends CircuitStateListener {
 
