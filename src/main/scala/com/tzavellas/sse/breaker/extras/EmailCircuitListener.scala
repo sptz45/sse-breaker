@@ -10,7 +10,7 @@ import javax.mail.{ Message, Session, Transport }
 import com.tzavellas.sse.breaker.CircuitBreaker
 import com.tzavellas.sse.breaker.CircuitStateListener
 
-class EmailCircuitListener(address: EmailAddress, config: SMTPConnectionConfig)
+class EmailCircuitListener(addresses: EmailConfig, config: SMTPConnectionConfig)
   extends CircuitStateListener {
 
   def onOpen(breaker: CircuitBreaker, error: Exception) {
@@ -31,8 +31,8 @@ class EmailCircuitListener(address: EmailAddress, config: SMTPConnectionConfig)
     val session = Session.getInstance(new Properties)
     
     val message = new MimeMessage(session)
-    message.setFrom(new InternetAddress(address.from))
-    message.setRecipients(Message.RecipientType.TO, address.to)
+    message.setFrom(new InternetAddress(addresses.from))
+    message.setRecipients(Message.RecipientType.TO, addresses.to)
     message.setSubject(subject)
     message.setText(body)
  
@@ -42,7 +42,7 @@ class EmailCircuitListener(address: EmailAddress, config: SMTPConnectionConfig)
   }
 }
 
-case class EmailAddress(from: String, to: String)
+case class EmailConfig(from: String, to: String)
 
 case class SMTPConnectionConfig(
   host: String,
