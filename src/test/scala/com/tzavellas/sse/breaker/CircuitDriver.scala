@@ -7,20 +7,20 @@ package com.tzavellas.sse.breaker
 import scala.concurrent.duration._
 
 trait CircuitDriver {
-  
-  val defaults = DefaultTestConfiguration
+
   val executor: CircuitExecutor
+
+  lazy val defaults = DefaultTestConfiguration
 
   def circuit = executor.circuitBreaker
   def config  = circuit.configuration
-  
-  
+
   def reconfigureWith(
     maxFailures: Int = defaults.maxFailures,
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
     failureCountTimeout: Duration = defaults.failureCountTimeout,
     maxMethodDuration: Duration = defaults.maxMethodDuration,
-    isFailure: Exception => Boolean = defaults.isFailure) {
+    isFailure: Throwable => Boolean = defaults.isFailure) {
     circuit.reconfigureWith(
       new CircuitConfiguration(
         maxFailures,
@@ -29,35 +29,22 @@ trait CircuitDriver {
         maxMethodDuration,
         isFailure))
   }
-  
-  def makeNormalCall(circuitIsOpen: Boolean = false) = {
-    try {
-      executor(normalOperation)
-    } catch {
-      case e: OpenCircuitException => 
-        if (circuitIsOpen) throw e
-        else throw new AssertionError("Unexpected OpenCircuitException!", e)
-    }
-  }
-  
+
+  def normalOperation: Any
+  def faultyOperation: Any
+
+  def makeNormalCall(circuitIsOpen: Boolean = false): Any
+  def makeCallWithNonLocalReturn(): Int
+  def generateFaults(numOfFaults: Int)
+
   def makeSlowCall() {
     val previous = config.maxMethodDuration
     circuit.reconfigureWith(config.copy(maxMethodDuration = 1.nano))
     makeNormalCall()
     circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }
-  
+
   def generateFaultsToOpen() {
     generateFaults(config.maxFailures)
   }
-  
-  def generateFaults(numOfFaults: Int) {
-    for (i <- 0 until numOfFaults)
-      try executor(faultyOperation) catch { case _: Exception => () }
-  }
-  
-  def normalOperation = 42 
-  def faultyOperation = throw new IllegalStateException
-  
-  def makeCallWithNonLocalReturn(): Int = executor { return 43 }
 }

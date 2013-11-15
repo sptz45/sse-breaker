@@ -5,6 +5,7 @@
 package com.tzavellas.sse.breaker
 
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 /**
  * Holds configuration data for the circuit-breaker.
@@ -15,15 +16,16 @@ import scala.concurrent.duration._
  *                            to the ''half-open'' state.
  * @param failureCountTimeout the duration after which the number of failures
  *                            will get reset.
- * @param isFailure           a function that decides whether to recored a thrown
- *                            exception as a failure.
  * @param maxMethodDuration   the duration after which a method execution is
  *                            considered a failure.
+ * @param isFailure           a function that decides whether to record a thrown
+ *                            `Throwable` as a failure. By default all `NonFatal`
+ *                            throwables are considered failures.
  */
 case class CircuitConfiguration(
     maxFailures: Int,
     openCircuitTimeout: Duration,
     failureCountTimeout: Duration,
     maxMethodDuration: Duration,
-    isFailure: Exception => Boolean = _ => true)
+    isFailure: Throwable => Boolean = { case NonFatal(e) => true; case _ => false })
 

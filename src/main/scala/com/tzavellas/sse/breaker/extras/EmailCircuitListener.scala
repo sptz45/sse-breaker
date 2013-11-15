@@ -13,7 +13,7 @@ import com.tzavellas.sse.breaker.CircuitStateListener
 class EmailCircuitListener(addresses: EmailConfig, config: SMTPConnectionConfig)
   extends CircuitStateListener {
 
-  def onOpen(breaker: CircuitBreaker, error: Exception) {
+  def onOpen(breaker: CircuitBreaker, error: Throwable) {
     sendEmail(
       subject = "Open circuit for " + breaker.name,
       body = "The system had lots of errors so it will stop processing.\n\n" +

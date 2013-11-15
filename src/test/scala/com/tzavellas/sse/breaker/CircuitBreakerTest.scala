@@ -8,14 +8,16 @@ import org.junit.Test
 import org.junit.Assert._
 import scala.concurrent.duration._
 
-class CircuitBreakerTest extends CircuitDriver {
+trait CircuitBreakerTest {
+
+  driver: CircuitDriver =>
 
   val listener = new TestListener
   val executor = new CircuitExecutor("test-circuit", defaults, listener)
   
   @Test
   def normal_operation_while_closed() {
-    assertEquals(normalOperation, executor(normalOperation))
+    assertEquals(42, makeNormalCall())
   }
   
   @Test(expected=classOf[OpenCircuitException])
@@ -38,7 +40,7 @@ class CircuitBreakerTest extends CircuitDriver {
        circuit.close()
        assertEquals(0, circuit.openedTimestamp)
        assertFalse(circuit.isOpen)
-       assertEquals(normalOperation, makeNormalCall())
+       makeNormalCall()
        return
     }
     fail("The call to the open circuit should have raised an OpenCircuitException")
@@ -162,25 +164,5 @@ class CircuitBreakerTest extends CircuitDriver {
     circuit.open()
     assertTrue(listener.error.isInstanceOf[ForcedOpenException])
   }
-  
-  
 
-  class TestListener extends CircuitStateListener {
-    
-    var opened, closed: Boolean = false
-    var error: Exception = _
-    
-    def onOpen(circuit: CircuitBreaker, exception: Exception)  {
-      opened = true
-      error = exception
-      assert(circuit.isOpen)
-    }
-    def onClose(circuit: CircuitBreaker) {
-      closed = true
-      assert(circuit.isClosed)
-    }
-    
-    def assertCalledOnOpen()  { assert(opened) }
-    def assertCalledOnClose() { assert(closed) }
-  }
 }

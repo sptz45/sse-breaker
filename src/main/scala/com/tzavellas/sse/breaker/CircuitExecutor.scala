@@ -4,6 +4,12 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.control.NonFatal
+import scala.util.{Success, Failure}
+import java.util.concurrent.Executor
+
 /**
  * An executor that implements the Circuit Breaker stability design pattern.
  * 
@@ -39,8 +45,8 @@ package com.tzavellas.sse.breaker
  * @see CircuitConfiguration
  * @see OpenCircuitException
  */
-class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
-  
+class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
+
   /**
    * Create an executor.
    * 
@@ -55,7 +61,9 @@ class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
   ) {
     this(new CircuitBreaker(circuitName, circuitConfig, circuitListener))
   }
-  
+
+  // -- public methods --------------------------------------------------------
+
   /**
    * Executes the specified operation depending on the state of the
    * circuit-breaker.
@@ -66,22 +74,61 @@ class CircuitExecutor(val circuitBreaker: CircuitBreaker) {
    * @throws OpenCircuitException if the circuit-breaker is open.
    */
   def apply[T](operation: => T): T = {
-    circuitBreaker.recordCall()
-    assertTheCircuitIsClosed()
+    val start = System.nanoTime
+    onStart()
     try {
-      val start = System.nanoTime
       val result = operation
-      val duration = System.nanoTime - start
-      circuitBreaker.recordExecutionTime(duration);
+      onSuccess(start)
       result
     } catch {
       case e: Exception =>
-        circuitBreaker.recordException(e)
+        onFailure(e)
         throw e
     }
   }
 
-  private def assertTheCircuitIsClosed() {
+  def apply[T](operation: => Future[T]): Future[T] = {
+    val start = System.nanoTime
+    try onStart() catch { case e: OpenCircuitException => return Future.failed(e) }
+    val result = try operation catch { case NonFatal(e) => Future.failed(e) }
+    result.onComplete({
+      case Success(_) => onSuccess(start)
+      case Failure(e) => onFailure(e)
+    })(CircuitExecutor.currentThreadExecutor)
+    result
+  }
+
+  def async[T](operation: => T)(implicit executor: ExecutionContext): Future[T] = {
+    val start = System.nanoTime
+    try onStart() catch { case e: OpenCircuitException => return Future.failed(e) }
+    val result = Future(operation)(executor)
+    result.onComplete({
+      case Success(_) => onSuccess(start)
+      case Failure(e) => onFailure(e)
+    })(CircuitExecutor.currentThreadExecutor)
+    result
+  }
+
+  // -- private methods -------------------------------------------------------
+
+  private def onStart() {
+    circuitBreaker.recordCall()
     if (circuitBreaker.isOpen) throw new OpenCircuitException(this)
   }
+
+  private def onSuccess(startNanosTsamp: Long) {
+    circuitBreaker.recordExecutionTime(System.nanoTime - startNanosTsamp)
+  }
+
+  private def onFailure(e: Throwable) {
+    circuitBreaker.recordThrowable(e)
+  }
+}
+
+private object CircuitExecutor {
+  val currentThreadExecutor: ExecutionContext = ExecutionContext.fromExecutor(new Executor {
+    def execute(command: Runnable) {
+      command.run()
+    }
+  })
 }

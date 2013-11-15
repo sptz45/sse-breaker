@@ -47,13 +47,13 @@ class CircuitBreaker(
     }
   }
   
-  private [breaker] def recordException(exception: Exception) {
-    if (conf.isFailure(exception)) {
-      recordFailure(exception)
+  private [breaker] def recordThrowable(throwable: Throwable) {
+    if (conf.isFailure(throwable)) {
+      recordFailure(throwable)
     }
   }
   
-  private def recordFailure(failure: Exception) {
+  private def recordFailure(failure: Throwable) {
     failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
@@ -125,7 +125,7 @@ class CircuitBreaker(
   }
   
   /** Opens this circuit-breaker. */
-  def open(failure: Exception) {
+  def open(failure: Throwable) {
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
     currentFailures.set(conf.maxFailures)

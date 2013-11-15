@@ -15,7 +15,7 @@ class LoggerCircuitListener(loggerName: String) extends CircuitStateListener {
 
   private val log = LoggerFactory.getLogger(loggerName)
 
-  def onOpen(breaker: CircuitBreaker, error: Exception) {
+  def onOpen(breaker: CircuitBreaker, error: Throwable) {
     log.error(s"Opened the circuit with name '${breaker.name}'", error)
   }
 

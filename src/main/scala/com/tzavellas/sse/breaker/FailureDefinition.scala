@@ -4,11 +4,11 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
-class FailureDefinition extends (Exception => Boolean) {
+class FailureDefinition extends (Throwable => Boolean) {
   
   private val ignoredExceptions = new ClassFilter
 
-  def apply(exception: Exception) = ! ignoredExceptions.contains(exception.getClass)
+  def apply(exception: Throwable) = ! ignoredExceptions.contains(exception.getClass)
   
   /**
    * When an exception of the specified type gets thrown as a result of an
