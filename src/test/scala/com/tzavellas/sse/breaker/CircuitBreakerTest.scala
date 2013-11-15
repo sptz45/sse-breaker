@@ -105,20 +105,8 @@ trait CircuitBreakerTest {
   }
   
   @Test
-  def ignored_exceptions_do_not_open_the_circuit() {
-    val failureDefinition = new FailureDefinition
-    reconfigureWith(isFailure = failureDefinition)
-    failureDefinition.ignoreException(classOf[IllegalStateException])
-    generateFaultsToOpen()
-    makeNormalCall()
-    assertTrue(circuit.isClosed)
-  }
-  
-  @Test
-  def ignored_exceptions_capture_subclasses() {
-    val failureDefinition = new FailureDefinition
-    reconfigureWith(isFailure = failureDefinition)
-    failureDefinition.ignoreException(classOf[RuntimeException])
+  def exceptions_that_are_considered_non_failures_do_not_open_the_circuit() {
+    reconfigureWith(isFailure = e => !e.isInstanceOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
     assertTrue(circuit.isClosed)
