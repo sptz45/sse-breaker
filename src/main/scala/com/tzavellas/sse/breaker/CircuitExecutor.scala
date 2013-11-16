@@ -16,8 +16,8 @@ import java.util.concurrent.Executor
  * The purpose of the a circuit-breaker is to keep track of the error rates
  * of dangerous operations (such as calls to an integration point) and prevent
  * the execution of those operations for a configurable amount of time when the
- * error rates are high. A circuit-breaker has three states: ''closed'',
- * ''open'' and ''half-open''.
+ * error rates are high by failing fast. A circuit-breaker has three states:
+ * ''closed'', ''open'' and ''half-open''.
  * 
  * During normal operation the circuit-breaker is ''closed'' and the
  * executor executes the specified operation, recording the number of failures
@@ -27,7 +27,8 @@ import java.util.concurrent.Executor
  * 
  * In the ''open'' state, since the probability that failures will happen
  * is high, the executor when requested to execute an operation ''fails fast''
- * by throwing an `OpenCircuitException`.
+ * by throwing an `OpenCircuitException` or by returning a `Future` that
+ * contains `OpenCircuitException` if the operation is asynchronous.
  * 
  * After a configurable amount of time the circuit-breaker goes to the
  * ''half-open'' state. In that state when a request to execute an operation
@@ -36,10 +37,6 @@ import java.util.concurrent.Executor
  * ''open'' state.
  * 
  * Instances of this class are ''thread-safe''.
- *
- * @constructor Creates an executor for the specified circuit-breaker.
- *
- * @param circuitBreaker the circuit-breaker of the executor.
  *
  * @see CircuitBreaker
  * @see CircuitConfiguration
@@ -71,7 +68,7 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
    * @param operation the operation to execute.
    * 
    * @return the result of the operation execution.
-   * @throws OpenCircuitException if the circuit-breaker is open.
+   * @throws OpenCircuitException if the circuit-breaker is ''open''.
    */
   def apply[T](operation: => T): T = {
     val start = System.nanoTime
@@ -87,6 +84,15 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
     }
   }
 
+  /**
+   * Executes the specified operation depending on the state of the
+   * circuit-breaker.
+   *
+   * @param operation the operation to execute.
+   *
+   * @return the result of the operation execution or a failed `Future` that
+   *         contains `OpenCircuitException` if the circuit-breaker is ''open''.
+   */
   def apply[T](operation: => Future[T]): Future[T] = {
     val start = System.nanoTime
     try onStart() catch { case e: OpenCircuitException => return Future.failed(e) }
@@ -98,6 +104,19 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
     result
   }
 
+  /**
+   * Executes the specified operation asynchronously depending on the state of
+   * the circuit-breaker using the given `ExecutionContext`.
+   *
+   * Use this method if you have a synchronous operation that you want to execute
+   * in a different thread. If the specified `operation` is already asynchronous
+   * (returns a `Future`) then use the `apply` method.
+   *
+   * @param operation the operation to execute.
+   *
+   * @return the result of the operation execution or a failed `Future` that
+   *         contains `OpenCircuitException` if the circuit-breaker is ''open''.
+   */
   def async[T](operation: => T)(implicit executor: ExecutionContext): Future[T] = {
     val start = System.nanoTime
     try onStart() catch { case e: OpenCircuitException => return Future.failed(e) }

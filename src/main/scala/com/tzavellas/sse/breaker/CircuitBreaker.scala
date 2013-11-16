@@ -14,7 +14,8 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
  * @param name       the name of the circuit-breaker (used in the JMX
  *                   `ObjectName`, can be used for logging, etc).
  * @param initConf   the initial configuration of the circuit-breaker.
- * @param listener   observes the state changes of this circuit-breaker.
+ * @param listener   a listener that observes the state changes of this
+ *                   circuit-breaker.
  * 
  * @see CircuitExecutor
  */
@@ -81,34 +82,34 @@ class CircuitBreaker(
   }
 
   /**
-   * Tests if the circuit-breaker is in the open state.
+   * Tests if the circuit-breaker is in the ''open'' state.
    * 
-   * <p>A circuit-breaker is in the open state when enough failures have
+   * A circuit-breaker is in the ''open'' state when enough failures have
    * occurred in a configured amount of time and the opened state hasn't
-   * expired yet.<p>
+   * expired yet.
    */
   def isOpen = currentFailures.get >= conf.maxFailures && !isHalfOpen
   
   /**
-   * Tests if the circuit-breaker is in the closed state.
+   * Tests if the circuit-breaker is in the ''closed'' state.
    * 
-   * <p>A circuit-breaker is in the closed state when it is not in the open
-   * state.</p>
+   * A circuit-breaker is in the ''closed'' state when the error rate is low
+   * and it allows the execution of the requested operations.
    */
   def isClosed = !isOpen
   
   /**
-   * Tests if the circuit-breaker is in the half-open state.
+   * Tests if the circuit-breaker is in the ''half-open'' state.
    * 
-   * <p>A circuit-breaker is in the half-open state when the open state has
-   * expired.</p>
+   * A circuit-breaker is in the ''half-open'' state when the ''open'' state
+   * has expired.
    */
   def isHalfOpen = {
     val timestampt = openTimestamp.get 
     timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
   }
   
-  /** Closes this circuit-breaker. */
+  /** Closes the circuit-breaker. */
   def close() {
     currentFailures.set(0)
     openTimestamp.set(0)
@@ -120,11 +121,12 @@ class CircuitBreaker(
     }
   }
   
+  /** Opens the circuit-breaker. */
   def open() {
     open(new ForcedOpenException(name))
   }
   
-  /** Opens this circuit-breaker. */
+  /** Opens the circuit-breaker. */
   def open(failure: Throwable) {
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
@@ -172,8 +174,8 @@ class CircuitBreaker(
   /**
    * Resets the statistics counters to zero.
    * 
-   * <p>The values of {@code numberOfFailedOperations}, {@code numberOfOperations} and
-   * {@code numberOfTimesOpened} are set to zero.</p>
+   * The values of `numberOfFailedOperations`, `numberOfOperations` and
+   * `numberOfTimesOpened` are set to zero.
    */
   def resetStatistics() {
     failures.set(0)
