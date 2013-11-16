@@ -9,8 +9,9 @@ import javax.mail.internet.{ InternetAddress, MimeMessage }
 import javax.mail.{ Message, Session, Transport }
 import com.tzavellas.sse.breaker.CircuitBreaker
 import com.tzavellas.sse.breaker.CircuitStateListener
+import com.tzavellas.sse.breaker.extras.EmailCircuitListener._
 
-class EmailCircuitListener(addresses: EmailConfig, config: SMTPConnectionConfig)
+class EmailCircuitListener(addresses: EmailConfig, config: SMTPConfig)
   extends CircuitStateListener {
 
   def onOpen(breaker: CircuitBreaker, error: Throwable) {
@@ -42,11 +43,9 @@ class EmailCircuitListener(addresses: EmailConfig, config: SMTPConnectionConfig)
   }
 }
 
-case class EmailConfig(from: String, to: String)
+object EmailCircuitListener {
 
-case class SMTPConnectionConfig(
-  host: String,
-  port: Int,
-  username: String,
-  password: String
-)
+  case class EmailConfig(from: String, to: String)
+
+  case class SMTPConfig(host: String, port: Int, username: String, password: String)
+}
