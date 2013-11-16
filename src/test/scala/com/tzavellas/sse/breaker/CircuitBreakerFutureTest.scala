@@ -4,11 +4,17 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
-import scala.concurrent.Future
+import org.junit.Test
 import scala.util.Success
 import scala.util.Failure
+import scala.concurrent.Future
 
-trait PromisedCircuitDriver extends CircuitDriver {
+class CircuitBreakerFutureTest extends AbstractCircuitBreakerTest with CircuitDriver {
+
+  @Test
+  def dummy_test() { }
+
+  // -- CircuitDriver implementation ------------------------------------------
 
   def makeNormalCall(circuitIsOpen: Boolean = false) = {
     val f = executor { normalOperation }

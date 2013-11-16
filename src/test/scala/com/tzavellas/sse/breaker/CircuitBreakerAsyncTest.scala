@@ -4,11 +4,16 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
+import org.junit.Test
 import scala.util.Success
 import scala.util.Failure
-import scala.concurrent.ExecutionContext
 
-trait AsynchronousCircuitDriver extends CircuitDriver {
+class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDriver {
+
+  @Test
+  def dummy_test() { }
+
+  // -- CircuitDriver implementation ------------------------------------------
 
   implicit def testExecutor = CircuitExecutor.currentThreadExecutor
 
