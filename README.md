@@ -14,7 +14,7 @@ During normal operation a circuit-breaker is in the *closed* state and allows
 the execution of the requested operations recording the number of failures
 that happen as a result of those operations. A failure is either a thrown
 exception for which the configured `CircuitConfiguration.isFailure` function
-returns `true` or a sucessful operation execution that takes more than the
+returns `true` or a successful operation execution that takes more than the
 configured `CircuitConfiguration.maxMethodDuration` duration to complete.
 
 When the number of failures that occur within the configured `CircuitConfiguration.failureCountTimeout`
@@ -33,28 +33,64 @@ state, else it moves back to the *open* state.
 
 ## Usage
 
-To use the *Circuit Breaker*, all you need to do is instantiate a
-`CircuitExecutor` with the appropriate configuration and call its `apply` method
-passing the closure containing the code with the high error rate (usually an
-*Integration Point*). If the circuit is *closed* or *half-open* then the
-executor will execute the closure else (if it is in the *open* state) the
-executor will throw an `OpenCircuitExeption` without executing the closure.
+To execute operations using a circuit-breaker you need to construct a
+`CircuitExecutor` and pass it the pieces of code you want to execute. This
+executor has an associated `CircuitBreaker` object which holds the state of the
+circuit-breaker and is consulted to decide whether to execute the requested
+operations or to *fail-fast*.
+
+To construct a `CircuitExecutor` you can use the following code:
 
 ```scala
-class StocksService(stocks: StocksGateway) {
 
-  val failFast = new CircuitExecutor(name="stocks-breaker")
+import com.tzavellas.sse.breaker.{CircuitExecutor, CircuitConfiguration}
+import scala.concurrent.duration._
 
-  def getQuote(ticker: String): Int = failFast {
-    stocks.getQuote(ticker)
-  }
-
-}
+val failFast = new CircuitExecutor(
+    name="tweets-breaker",
+    CircuitConfiguration(
+      maxFailures = 5,
+      openCircuitTimeout = 30.seconds,
+      failureCountTimeout = 1.minute,
+      maxMethodDuration =  10.seconds)
+  )
 ```
+The above code will construct a `CircuitExecutor` with the name *"tweets-breaker"*
+using the specified configuration. The configuration says that if 5 failures
+(maxFailures) occur within 1 minute (failureCountTimeout) then the circuit breaker
+will move to the *open* state and move to the *half-open* state 30 seconds later
+(openCircuitTimeout). Also the maximum amount of time an operation might take without
+recording it as failure is 10 seconds (maxMethodDuration).
 
-For more information see the scaladoc of `CircuitExecutor`, `CircuitBreaker` and
-`CircuitConfiguration`.
+Using the executor with a synchronous operation:
 
+```scala
+def getTweets(user: String): Seq[Tweet] = ...
+
+val tweets =
+  try failFast { getTweets("sptz45") }
+  catch { case e: OpenCircuitException => Seq() }
+```
+Using the executor with an asynchronous operation (one that returns a `Future`):
+
+```scala
+import scala.concurrent.Future
+
+def getTweets(user: String): Future[Seq[Tweet]] = ...
+
+val tweets = failFast(getTweets("sptz45")).recover { case _: OpenCircuitException => Seq() }
+```
+Using the executor by launching a synchronous operation in an `ExecutionContext` and returning a `Future`:
+
+```scala
+import scala.concurrent.{Future, ExecutionContext}
+
+implicit val executionContext = ExecutionContext.fromExecutor(...)
+
+def getTweets(user: String): Seq[Tweet]] = ...
+
+val tweets = failFast.async(getTweets("sptz45")).recover { case _: OpenCircuitException => Seq() }
+```
 
 ## License
 
