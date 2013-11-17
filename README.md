@@ -57,10 +57,10 @@ val failFast = new CircuitExecutor(
 ```
 The above code will construct a `CircuitExecutor` with the name *"tweets-breaker"*
 using the specified configuration. The configuration says that if 5 failures
-(maxFailures) occur within 1 minute (failureCountTimeout) then the circuit breaker
+(`maxFailures`) occur within 1 minute (`failureCountTimeout`) then the circuit breaker
 will move to the *open* state and move to the *half-open* state 30 seconds later
-(openCircuitTimeout). Also the maximum amount of time an operation might take without
-recording it as failure is 10 seconds (maxMethodDuration).
+(`openCircuitTimeout`). Also the maximum amount of time an operation might take without
+recording it as failure is 10 seconds (`maxMethodDuration`).
 
 Using the executor with a synchronous operation:
 
@@ -78,7 +78,8 @@ import scala.concurrent.Future
 
 def getTweets(user: String): Future[Seq[Tweet]] = ...
 
-val tweets = failFast(getTweets("sptz45")).recover { case _: OpenCircuitException => Seq() }
+val tweets = failFast(getTweets("sptz45"))
+               .recover { case _: OpenCircuitException => Seq() }
 ```
 Using the executor by launching a synchronous operation in an `ExecutionContext` and returning a `Future`:
 
@@ -89,7 +90,8 @@ implicit val executionContext = ExecutionContext.fromExecutor(...)
 
 def getTweets(user: String): Seq[Tweet]] = ...
 
-val tweets = failFast.async(getTweets("sptz45")).recover { case _: OpenCircuitException => Seq() }
+val tweets = failFast.async(getTweets("sptz45"))
+               .recover { case _: OpenCircuitException => Seq() }
 ```
 
 ## License
