@@ -88,7 +88,7 @@ import scala.concurrent.{Future, ExecutionContext}
 
 implicit val executionContext = ExecutionContext.fromExecutor(...)
 
-def getTweets(user: String): Seq[Tweet]] = ...
+def getTweets(user: String): Seq[Tweet] = ...
 
 val tweets = failFast.async(getTweets("sptz45"))
                .recover { case _: OpenCircuitException => Seq() }
