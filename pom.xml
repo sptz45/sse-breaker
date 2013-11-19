@@ -9,7 +9,7 @@
 	
 	<groupId>com.tzavellas</groupId>
 	<artifactId>sse-breaker</artifactId>
-	<version>0.8.0</version>
+	<version>0.8.1-SNAPSHOT</version>
 	<inceptionYear>2009</inceptionYear>
 	<name>sse-breaker</name>
 	<description>An implementation of the Circuit Breaker stability design pattern in Scala</description>
