@@ -1,12 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+	
 	<groupId>com.tzavellas</groupId>
 	<artifactId>sse-breaker</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.8.0-SNAPSHOT</version>
 	<inceptionYear>2009</inceptionYear>
 	<name>sse-breaker</name>
 	<description>An implementation of the Circuit Breaker stability design pattern in Scala</description>
+	
+	<packaging>jar</packaging>
 
 	<organization>
         <name>spiros.blog()</name>
@@ -105,7 +114,6 @@
 					<args>
 						<arg>-deprecation</arg>
 						<arg>-unchecked</arg>
-						<arg>-optimize</arg>
 						<arg>-encoding</arg>
 						<arg>${project.build.sourceEncoding}</arg>
 					</args>
@@ -137,6 +145,28 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+            	<artifactId>maven-enforcer-plugin</artifactId>
+            	<version>1.0.1</version>
+            	<executions>
+            		<execution>
+            			<id>enforce-tools</id>
+            			<goals>
+            				<goal>enforce</goal>
+            			</goals>
+            			<configuration>
+            				<rules>
+            					<requireJavaVersion>
+            						<version>[1.6.0,)</version>
+            					</requireJavaVersion>
+            					<requireMavenVersion>
+            						<version>[3.0.3,)</version>
+            					</requireMavenVersion>
+            				</rules>
+            			</configuration>
+            		</execution>
+            	</executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
