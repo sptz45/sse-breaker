@@ -94,6 +94,18 @@ val tweets = failFast.async(getTweets("sptz45"))
                .recover { case _: OpenCircuitException => Seq() }
 ```
 
+## Setup
+
+For *Scala 2.10.x* use:
+
+```xml
+<dependency>
+  <groupId>com.tzavellas</groupId>
+  <artifactId>sse-breaker</artifactId>
+  <version>0.8.0</version>
+</dependency>
+```
+
 ## License
 
 Licensed under the Apache License, Version 2.0. See the LICENSE and NOTICE
