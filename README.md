@@ -47,8 +47,8 @@ import com.tzavellas.sse.breaker.{CircuitExecutor, CircuitConfiguration}
 import scala.concurrent.duration._
 
 val failFast = new CircuitExecutor(
-    name="tweets-breaker",
-    CircuitConfiguration(
+    circuitName="tweets-breaker",
+    circuitConfig=CircuitConfiguration(
       maxFailures = 5,
       openCircuitTimeout = 30.seconds,
       failureCountTimeout = 1.minute,
@@ -65,7 +65,7 @@ recording it as failure is 10 seconds (`maxMethodDuration`).
 Using the executor with a synchronous operation:
 
 ```scala
-def getTweets(user: String): Seq[Tweet] = ...
+def getTweets(user: String): Seq[Tweet] = ???
 
 val tweets =
   try failFast { getTweets("sptz45") }
@@ -74,11 +74,13 @@ val tweets =
 Using the executor with an asynchronous operation (one that returns a `Future`):
 
 ```scala
-import scala.concurrent.Future
+import scala.concurrent.{Future, ExecutionContext}
 
-def getTweets(user: String): Future[Seq[Tweet]] = ...
+implicit val executionContext = ExecutionContext.fromExecutor(???)
 
-val tweets = failFast(getTweets("sptz45"))
+def getTweetsAsync(user: String): Future[Seq[Tweet]] = ???
+
+val tweets = failFast(getTweetsAsync("sptz45"))
                .recover { case _: OpenCircuitException => Seq() }
 ```
 Using the executor by launching a synchronous operation in an `ExecutionContext` and returning a `Future`:
@@ -86,9 +88,9 @@ Using the executor by launching a synchronous operation in an `ExecutionContext`
 ```scala
 import scala.concurrent.{Future, ExecutionContext}
 
-implicit val executionContext = ExecutionContext.fromExecutor(...)
+implicit val executionContext = ExecutionContext.fromExecutor(???)
 
-def getTweets(user: String): Seq[Tweet] = ...
+def getTweets(user: String): Seq[Tweet] = ???
 
 val tweets = failFast.async(getTweets("sptz45"))
                .recover { case _: OpenCircuitException => Seq() }
