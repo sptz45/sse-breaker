@@ -35,16 +35,16 @@ trait CircuitDriver {
 
   def makeNormalCall(circuitIsOpen: Boolean = false): Any
   def makeCallWithNonLocalReturn(): Int
-  def generateFaults(numOfFaults: Int)
+  def generateFaults(numOfFaults: Int): Unit
 
-  def makeSlowCall() {
+  def makeSlowCall(): Unit = {
     val previous = config.maxMethodDuration
     circuit.reconfigureWith(config.copy(maxMethodDuration = 1.nano))
     makeNormalCall()
     circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }
 
-  def generateFaultsToOpen() {
+  def generateFaultsToOpen(): Unit = {
     generateFaults(config.maxFailures)
   }
 }

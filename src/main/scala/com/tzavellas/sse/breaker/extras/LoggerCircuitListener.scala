@@ -3,7 +3,8 @@
  * Author: Spiros Tzavellas                        *
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker.extras
-import org.slf4j.LoggerFactory;
+
+import org.slf4j.LoggerFactory
 import com.tzavellas.sse.breaker.CircuitBreaker
 import com.tzavellas.sse.breaker.CircuitStateListener
 

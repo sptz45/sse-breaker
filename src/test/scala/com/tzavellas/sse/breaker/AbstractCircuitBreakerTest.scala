@@ -113,7 +113,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def slow_metnod_executions_count_as_failures() {
+  def slow_method_executions_count_as_failures() {
     for (i <- 0 until defaults.maxFailures) makeSlowCall()
     assertTrue(circuit.isOpen)
   }

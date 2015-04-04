@@ -11,23 +11,23 @@ class TestListener extends CircuitStateListener {
   var opened, closed: Boolean = false
   var error: Throwable = _
 
-  def onOpen(circuit: CircuitBreaker, error: Throwable)  {
+  def onOpen(circuit: CircuitBreaker, error: Throwable): Unit = {
     opened = true
     this.error = error
     assertNotNull(error)
     assertTrue(circuit.isOpen)
   }
 
-  def onClose(circuit: CircuitBreaker) {
+  def onClose(circuit: CircuitBreaker): Unit = {
     closed = true
     assertTrue(circuit.isClosed)
   }
 
-  def assertCalledOnOpen()  {
+  def assertCalledOnOpen(): Unit = {
     assertTrue(opened)
   }
 
-  def assertCalledOnClose() {
+  def assertCalledOnClose(): Unit = {
     assertTrue(closed)
   }
 }

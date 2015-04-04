@@ -15,14 +15,14 @@ class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDri
 
   // -- CircuitDriver implementation ------------------------------------------
 
-  implicit def testExecutor = CircuitExecutor.currentThreadExecutor
+  implicit val testExecutor = CircuitExecutor.currentThreadExecutor
 
   def makeNormalCall(circuitIsOpen: Boolean = false) = {
     val f = executor.async(normalOperation)
     f.value.get match {
-      case Success(i)                    => i
-      case Failure(e) if (circuitIsOpen) => throw e
-      case Failure(e)                    => throw new AssertionError("Unexpected exception!", e)
+      case Success(i)                  => i
+      case Failure(e) if circuitIsOpen => throw e
+      case Failure(e)                  => throw new AssertionError("Unexpected exception!", e)
     }
   }
 

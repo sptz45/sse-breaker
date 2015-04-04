@@ -16,14 +16,14 @@ trait CircuitStateListener {
    * 
    * @param circuit the circuit-breaker that got opened
    */
-  def onOpen(circuit: CircuitBreaker, error: Throwable)
+  def onOpen(circuit: CircuitBreaker, error: Throwable): Unit
   
   /**
    * Called when a circuit-breaker moves into the ''closed'' state.
    * 
    * @param circuit the circuit-breaker that got closed
    */
-  def onClose(circuit: CircuitBreaker)
+  def onClose(circuit: CircuitBreaker): Unit
 }
 
 
@@ -31,18 +31,13 @@ object CircuitStateListener {
   
   /** A ''null object'' implementation for CircuitStateChangeListener. */
   object empty extends CircuitStateListener {
-    def onOpen(circuit: CircuitBreaker, error: Throwable) { }
-    def onClose(circuit: CircuitBreaker) { }
+    def onOpen(circuit: CircuitBreaker, error: Throwable): Unit = { }
+    def onClose(circuit: CircuitBreaker): Unit = { }
   }
-  
-  def of(listeners: CircuitStateListener*): CircuitStateListener = {
-    new CircuitStateListener {
-	  def onOpen(circuit: CircuitBreaker, error: Throwable) {
-	    listeners foreach { _.onOpen(circuit, error) }
-	  }
-	  def onClose(circuit: CircuitBreaker) {
-	    listeners foreach { _.onClose(circuit) }
-	  }
-	}
+
+  /** Create a composite CircuitStateListener. */
+  def of(listeners: CircuitStateListener*): CircuitStateListener = new CircuitStateListener {
+	  def onOpen(circuit: CircuitBreaker, error: Throwable): Unit = listeners.foreach(_.onOpen(circuit, error))
+	  def onClose(circuit: CircuitBreaker): Unit = listeners.foreach(_.onClose(circuit))
   }
 }

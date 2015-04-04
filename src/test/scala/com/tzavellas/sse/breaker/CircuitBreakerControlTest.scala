@@ -4,7 +4,6 @@
 \* ----------------------------------------------- */
 package com.tzavellas.sse.breaker
 
-import java.util.Date
 import org.junit.Test
 import org.junit.Assert._
 import scala.concurrent.duration._

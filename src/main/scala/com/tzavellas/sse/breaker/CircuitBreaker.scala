@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 
 /**
  * Holds the state of a circuit-breaker.
-
+ *
  * Instances of this class are ''thread-safe''.
  * 
  * @param name       the name of the circuit-breaker (used in the JMX
@@ -77,7 +77,7 @@ class CircuitBreaker(
     firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime)
   }
   
-  private def hasFailureCountExpired() = {
+  private def hasFailureCountExpired = {
     System.nanoTime - firstCurrentFailureTimestamp.get >= conf.failureCountTimeout.toNanos
   }
 
@@ -105,8 +105,8 @@ class CircuitBreaker(
    * has expired.
    */
   def isHalfOpen = {
-    val timestampt = openTimestamp.get 
-    timestampt != 0 && timestampt + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
+    val timestamp = openTimestamp.get
+    timestamp != 0 && timestamp + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
   }
   
   /** Closes the circuit-breaker. */

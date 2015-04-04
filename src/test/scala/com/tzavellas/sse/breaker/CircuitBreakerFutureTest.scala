@@ -19,9 +19,9 @@ class CircuitBreakerFutureTest extends AbstractCircuitBreakerTest with CircuitDr
   def makeNormalCall(circuitIsOpen: Boolean = false) = {
     val f = executor { normalOperation }
     f.value.get match {
-      case Success(i)                    => i
-      case Failure(e) if (circuitIsOpen) => throw e
-      case Failure(e)                    => throw new AssertionError("Unexpected exception!", e)
+      case Success(i)                  => i
+      case Failure(e) if circuitIsOpen => throw e
+      case Failure(e)                  => throw new AssertionError("Unexpected exception!", e)
     }
   }
 
