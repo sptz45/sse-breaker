@@ -17,8 +17,7 @@ class EmailCircuitListener(addresses: EmailConfig, config: SMTPConfig)
   def onOpen(breaker: CircuitBreaker, error: Throwable) {
     sendEmail(
       subject = "Open circuit for " + breaker.name,
-      body = "The system had lots of errors so it will stop processing.\n\n" +
-    		 "Last error was: " + error.getStackTraceString)
+      body = s"The system had lots of errors so it will stop processing temporarily. Last error was...\n ${format(error)}")
   }
 
   def onClose(breaker: CircuitBreaker) {
@@ -30,17 +29,26 @@ class EmailCircuitListener(addresses: EmailConfig, config: SMTPConfig)
 
   private def sendEmail(subject: String, body: String) {
     val session = Session.getInstance(new Properties)
-    
+
     val message = new MimeMessage(session)
     message.setFrom(new InternetAddress(addresses.from))
     message.setRecipients(Message.RecipientType.TO, addresses.to)
     message.setSubject(subject)
     message.setText(body)
- 
+
     val transport = session.getTransport("smtp")
-    transport.connect(config.host, config.port, config.username, config.password);
-    Transport.send(message);
+    transport.connect(config.host, config.port, config.username, config.password)
+    Transport.send(message)
   }
+
+  private def format(error: Throwable) = s"""
+     |Exception: ${error.getClass}
+     |
+     |Message: ${error.getMessage}
+     |
+     |Stacktrace:
+     |${error.getStackTrace.mkString("\n")}
+   """.stripMargin
 }
 
 object EmailCircuitListener {
