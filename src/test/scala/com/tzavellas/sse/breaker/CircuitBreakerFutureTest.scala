@@ -12,7 +12,7 @@ import scala.concurrent.Future
 class CircuitBreakerFutureTest extends AbstractCircuitBreakerTest with CircuitDriver {
 
   @Test
-  def dummy_test() { }
+  def dummy_test(): Unit = { }
 
   // -- CircuitDriver implementation ------------------------------------------
 
@@ -33,7 +33,7 @@ class CircuitBreakerFutureTest extends AbstractCircuitBreakerTest with CircuitDr
     }
   }
 
-  def generateFaults(numOfFaults: Int) {
+  def generateFaults(numOfFaults: Int): Unit = {
     for (i <- 0 until numOfFaults) executor { faultyOperation }
   }
 

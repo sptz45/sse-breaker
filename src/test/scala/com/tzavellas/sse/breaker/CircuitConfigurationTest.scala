@@ -13,14 +13,14 @@ class CircuitConfigurationTest {
   def config = DefaultTestConfiguration
   
   @Test
-  def fatal_throwables_are_not_failures() {
+  def fatal_throwables_are_not_failures(): Unit = {
     assertFalse(config.isFailure(new ThreadDeath))
     assertFalse(config.isFailure(new InterruptedException))
     assertFalse(config.isFailure(new NonLocalReturnControl(null, null)))
   }
   
   @Test
-  def all_exceptions_are_failures() {
+  def all_exceptions_are_failures(): Unit = {
     assertTrue(config.isFailure(new Exception))
   }
 }

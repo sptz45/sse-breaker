@@ -20,7 +20,7 @@ trait CircuitDriver {
     openCircuitTimeout: Duration = defaults.openCircuitTimeout,
     failureCountTimeout: Duration = defaults.failureCountTimeout,
     maxMethodDuration: Duration = defaults.maxMethodDuration,
-    isFailure: Throwable => Boolean = defaults.isFailure) {
+    isFailure: Throwable => Boolean = defaults.isFailure): Unit = {
     circuit.reconfigureWith(
       new CircuitConfiguration(
         maxFailures,
@@ -44,7 +44,5 @@ trait CircuitDriver {
     circuit.reconfigureWith(config.copy(maxMethodDuration = previous))
   }
 
-  def generateFaultsToOpen(): Unit = {
-    generateFaults(config.maxFailures)
-  }
+  def generateFaultsToOpen(): Unit = generateFaults(config.maxFailures)
 }

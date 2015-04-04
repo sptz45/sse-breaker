@@ -16,7 +16,7 @@ class JmxIntegrationTest {
   def circuit = executor.circuitBreaker
   
   @Test
-  def register_and_use_the_mbean() {
+  def register_and_use_the_mbean(): Unit = {
     executor.exportToJmx()
     val mbean = JMX.newMBeanProxy(server,
                                   CircuitJmxExporter.objectNameOf(circuit),

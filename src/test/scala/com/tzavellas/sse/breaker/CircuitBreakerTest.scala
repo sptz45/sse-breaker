@@ -9,5 +9,5 @@ import org.junit.Test
 class CircuitBreakerTest extends AbstractCircuitBreakerTest with SynchronousCircuitDriver {
 
   @Test
-  def dummy_test() { }
+  def dummy_test(): Unit = { }
 }

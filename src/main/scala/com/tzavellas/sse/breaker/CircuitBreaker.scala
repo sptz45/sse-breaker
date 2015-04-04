@@ -39,7 +39,7 @@ class CircuitBreaker(
     calls.incrementAndGet()
   }
   
-  private[breaker] def recordExecutionTime(nanos: Long) {
+  private[breaker] def recordExecutionTime(nanos: Long): Unit = {
     if (nanos > conf.maxMethodDuration.toNanos) {
       recordFailure(new SlowMethodExecutionException(conf.maxMethodDuration))
     }
@@ -48,13 +48,13 @@ class CircuitBreaker(
     }
   }
   
-  private [breaker] def recordThrowable(throwable: Throwable) {
+  private [breaker] def recordThrowable(throwable: Throwable): Unit = {
     if (conf.isFailure(throwable)) {
       recordFailure(throwable)
     }
   }
   
-  private def recordFailure(failure: Throwable) {
+  private def recordFailure(failure: Throwable): Unit = {
     failures.incrementAndGet()
     initFirstFailureTimeStampIfNeeded()
     var tmpCurrentFailures = 0
@@ -68,12 +68,12 @@ class CircuitBreaker(
         open(failure)
   }
   
-  private def resetFailures() {
+  private def resetFailures(): Unit = {
     currentFailures.set(1)
     firstCurrentFailureTimestamp.set(System.nanoTime)
   }
   
-  private def initFirstFailureTimeStampIfNeeded() {
+  private def initFirstFailureTimeStampIfNeeded(): Unit = {
     firstCurrentFailureTimestamp.compareAndSet(0, System.nanoTime)
   }
   
@@ -110,7 +110,7 @@ class CircuitBreaker(
   }
   
   /** Closes the circuit-breaker. */
-  def close() {
+  def close(): Unit = {
     currentFailures.set(0)
     openTimestamp.set(0)
     try {
@@ -122,12 +122,10 @@ class CircuitBreaker(
   }
   
   /** Opens the circuit-breaker. */
-  def open() {
-    open(new ForcedOpenException(name))
-  }
+  def open(): Unit = open(new ForcedOpenException(name))
   
   /** Opens the circuit-breaker. */
-  def open(failure: Throwable) {
+  def open(failure: Throwable): Unit = {
     timesOpened.incrementAndGet()
     openTimestamp.set(System.currentTimeMillis)  
     currentFailures.set(conf.maxFailures)
@@ -143,9 +141,7 @@ class CircuitBreaker(
   def configuration = conf
   
   /** Reconfigures this circuit-breaker using the specified configuration. */
-  def reconfigureWith(newConf: CircuitConfiguration) {
-    conf = newConf
-  }
+  def reconfigureWith(newConf: CircuitConfiguration): Unit = { conf = newConf }
   
   /**
    * The timestamp of the last transition to the open state (zero when the
@@ -177,7 +173,7 @@ class CircuitBreaker(
    * The values of `numberOfFailedOperations`, `numberOfOperations` and
    * `numberOfTimesOpened` are set to zero.
    */
-  def resetStatistics() {
+  def resetStatistics(): Unit = {
     failures.set(0)
     calls.set(0)
     timesOpened.set(0)

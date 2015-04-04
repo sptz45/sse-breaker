@@ -18,7 +18,7 @@ trait SynchronousCircuitDriver extends CircuitDriver {
 
   def makeCallWithNonLocalReturn(): Int = executor { return 43 }
 
-  def generateFaults(numOfFaults: Int) {
+  def generateFaults(numOfFaults: Int): Unit = {
     for (i <- 0 until numOfFaults)
       try executor(faultyOperation) catch { case _: Exception => () }
   }

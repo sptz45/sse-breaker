@@ -15,7 +15,7 @@ class CircuitBreakerControlTest extends SynchronousCircuitDriver {
   
   
   @Test
-  def the_control_can_read_the_state_of_the_circuit() {
+  def the_control_can_read_the_state_of_the_circuit(): Unit = {
     assertEquals(circuit.name, control.getName)
     assertFalse(control.isOpen)
     generateFaultsToOpen()
@@ -26,7 +26,7 @@ class CircuitBreakerControlTest extends SynchronousCircuitDriver {
   }
   
   @Test
-  def the_control_can_manipulate_the_state_of_the_circuit() {
+  def the_control_can_manipulate_the_state_of_the_circuit(): Unit = {
     control.open()
     assertTrue(circuit.isOpen)
     control.close()
@@ -34,7 +34,7 @@ class CircuitBreakerControlTest extends SynchronousCircuitDriver {
   }
 
   @Test
-  def the_control_can_reconfigure_the_circuit() {
+  def the_control_can_reconfigure_the_circuit(): Unit = {
     assertEquals(config.maxFailures, control.getMaxFailures)
     control.setMaxFailures(2)
     assertEquals(2, config.maxFailures)
@@ -53,7 +53,7 @@ class CircuitBreakerControlTest extends SynchronousCircuitDriver {
   }
   
   @Test
-  def the_control_can_read_statistics() {
+  def the_control_can_read_statistics(): Unit = {
     generateFaultsToOpen()
     assertEquals(circuit.numberOfCurrentFailures, control.getCurrentFailures)
     assertEquals(circuit.numberOfFailedOperations, control.getFailedOperations)

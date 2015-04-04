@@ -11,7 +11,7 @@ import scala.util.Failure
 class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDriver {
 
   @Test
-  def dummy_test() { }
+  def dummy_test(): Unit = { }
 
   // -- CircuitDriver implementation ------------------------------------------
 
@@ -34,7 +34,7 @@ class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDri
     }
   }
 
-  def generateFaults(numOfFaults: Int) {
+  def generateFaults(numOfFaults: Int): Unit = {
     for (i <- 0 until numOfFaults) executor.async(faultyOperation)
   }
 

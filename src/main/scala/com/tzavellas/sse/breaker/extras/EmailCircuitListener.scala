@@ -14,20 +14,20 @@ import com.tzavellas.sse.breaker.extras.EmailCircuitListener._
 class EmailCircuitListener(addresses: EmailConfig, config: SMTPConfig)
   extends CircuitStateListener {
 
-  def onOpen(breaker: CircuitBreaker, error: Throwable) {
+  def onOpen(breaker: CircuitBreaker, error: Throwable): Unit = {
     sendEmail(
       subject = "Open circuit for " + breaker.name,
       body = s"The system had lots of errors so it will stop processing temporarily. Last error was...\n ${format(error)}")
   }
 
-  def onClose(breaker: CircuitBreaker) {
+  def onClose(breaker: CircuitBreaker): Unit = {
     sendEmail(
       subject = "Closed circuit for '" + breaker.name + "'",
       body = "The system is back to normal")
   }
 
 
-  private def sendEmail(subject: String, body: String) {
+  private def sendEmail(subject: String, body: String): Unit = {
     val session = Session.getInstance(new Properties)
 
     val message = new MimeMessage(session)

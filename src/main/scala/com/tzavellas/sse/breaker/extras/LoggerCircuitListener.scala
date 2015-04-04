@@ -10,17 +10,15 @@ import com.tzavellas.sse.breaker.CircuitStateListener
 
 class LoggerCircuitListener(loggerName: String) extends CircuitStateListener {
 
-  def this(loggerName: Class[_]) {
-    this(loggerName.getName)
-  }
+  def this(loggerName: Class[_]) = this(loggerName.getName)
 
   private val log = LoggerFactory.getLogger(loggerName)
 
-  def onOpen(breaker: CircuitBreaker, error: Throwable) {
+  def onOpen(breaker: CircuitBreaker, error: Throwable): Unit = {
     log.error(s"Opened the circuit with name '${breaker.name}'", error)
   }
 
-  def onClose(breaker: CircuitBreaker) {
+  def onClose(breaker: CircuitBreaker): Unit = {
     log.info(s"Closed the circuit with name '${breaker.name}'")
   }
 }

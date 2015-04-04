@@ -26,9 +26,7 @@ trait CircuitJmxExporter {
    * Unregister the `CircuitBreakerControlMBean` that is associated with this
    * executor from the platform MBean server.
    */
-  def removeFromJmx(): Unit = {
-    server.unregisterMBean(objectNameOf(circuitBreaker))
-  }
+  def removeFromJmx(): Unit = server.unregisterMBean(objectNameOf(circuitBreaker))
   
   private def server = ManagementFactory.getPlatformMBeanServer
 }

@@ -16,12 +16,12 @@ trait AbstractCircuitBreakerTest {
   val executor = new CircuitExecutor("test-circuit", defaults, listener)
   
   @Test
-  def normal_operation_while_closed() {
+  def normal_operation_while_closed(): Unit = {
     assertEquals(42, makeNormalCall())
   }
   
   @Test(expected=classOf[OpenCircuitException])
-  def after_a_number_of_faults_the_circuit_opens() {
+  def after_a_number_of_faults_the_circuit_opens(): Unit = {
     generateFaultsToOpen()
     assertTrue(circuit.isOpen)
     assertTrue(circuit.openedTimestamp > 0)
@@ -29,7 +29,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_can_be_closed_from_the_thrown_exception_data_after_opened() {
+  def the_circuit_can_be_closed_from_the_thrown_exception_data_after_opened(): Unit = {
     generateFaultsToOpen()
     try {
       makeNormalCall(circuitIsOpen=true)
@@ -47,7 +47,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_is_half_open_after_the_timeout() {
+  def the_circuit_is_half_open_after_the_timeout(): Unit = {
     reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
@@ -55,7 +55,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_moves_from_half_open_to_closed_on_first_successful_operation() {
+  def the_circuit_moves_from_half_open_to_closed_on_first_successful_operation(): Unit = {
     reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
@@ -66,7 +66,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def the_circuit_moves_from_half_open_to_open_on_first_failure() {
+  def the_circuit_moves_from_half_open_to_open_on_first_failure(): Unit = {
     reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
@@ -76,7 +76,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def slow_methods_do_not_close_the_circuit_when_half_open() {
+  def slow_methods_do_not_close_the_circuit_when_half_open(): Unit = {
     reconfigureWith(openCircuitTimeout = 1.milli)
     generateFaultsToOpen()
     Thread.sleep(2)
@@ -87,7 +87,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def the_failure_count_gets_reset_after_an_amount_of_time() {
+  def the_failure_count_gets_reset_after_an_amount_of_time(): Unit = {
     reconfigureWith(failureCountTimeout = 1.milli)
     generateFaults(defaults.maxFailures - 1)
     assertTrue(circuit.isClosed)
@@ -98,14 +98,14 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def disable_breaker_by_setting_extremely_low_failure_count_timeout() {
+  def disable_breaker_by_setting_extremely_low_failure_count_timeout(): Unit = {
     reconfigureWith(failureCountTimeout = 1.nano)
     generateFaultsToOpen()
     assertTrue(circuit.isClosed)
   }
   
   @Test
-  def exceptions_that_are_considered_non_failures_do_not_open_the_circuit() {
+  def exceptions_that_are_considered_non_failures_do_not_open_the_circuit(): Unit = {
     reconfigureWith(isFailure = e => !e.isInstanceOf[IllegalStateException])
     generateFaultsToOpen()
     makeNormalCall()
@@ -113,20 +113,20 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def slow_method_executions_count_as_failures() {
+  def slow_method_executions_count_as_failures(): Unit = {
     for (i <- 0 until defaults.maxFailures) makeSlowCall()
     assertTrue(circuit.isOpen)
   }
   
   @Test
-  def non_local_returns_are_not_recorded_as_failures() {
+  def non_local_returns_are_not_recorded_as_failures(): Unit = {
     for (i <- 0 until defaults.maxFailures)
       makeCallWithNonLocalReturn()
     assertTrue(circuit.isClosed)
   }
   
   @Test
-  def circuit_listener_gets_called_when_the_circuits_state_changes() {
+  def circuit_listener_gets_called_when_the_circuits_state_changes(): Unit = {
     generateFaultsToOpen()
     listener.assertCalledOnOpen()
     circuit.close()
@@ -134,7 +134,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def statistics_get_updated_as_the_ciruit_breaker_gets_used() {
+  def statistics_get_updated_as_the_ciruit_breaker_gets_used(): Unit = {
     makeNormalCall()
     assertEquals(1, circuit.numberOfOperations)
     generateFaults(1)
@@ -145,7 +145,7 @@ trait AbstractCircuitBreakerTest {
   }
   
   @Test
-  def circuit_listener_receives_the_last_exception() {
+  def circuit_listener_receives_the_last_exception(): Unit = {
     generateFaultsToOpen()
     assertTrue(listener.error.isInstanceOf[IllegalStateException])
     circuit.close()

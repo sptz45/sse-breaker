@@ -15,13 +15,13 @@ private trait CircuitBreakerControlMBean {
   def close()
   
   def getMaxFailures: Int
-  def setMaxFailures(max: Int)
+  def setMaxFailures(max: Int): Unit
   
   def getOpenCircuitTimeout: String
-  def setOpenCircuitTimeout(timeout: String)
+  def setOpenCircuitTimeout(timeout: String): Unit
   
   def getFailureCountTimeout: String
-  def setFailureCountTimeout(timeout: String)
+  def setFailureCountTimeout(timeout: String): Unit
   
   def getOpenedTimestamp: Date 
   def getCurrentFailures: Int
@@ -29,8 +29,8 @@ private trait CircuitBreakerControlMBean {
   def getTotalOperations: Int
   def getNumberOfTimesOpened: Int
   
-  def resetStatistics()
+  def resetStatistics(): Unit
   
   def getMaxMethodDuration: String
-  def setMaxMethodDuration(duration: String)
+  def setMaxMethodDuration(duration: String): Unit
 }

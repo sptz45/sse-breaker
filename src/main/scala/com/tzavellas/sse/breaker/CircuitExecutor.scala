@@ -55,7 +55,7 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
     circuitName: String,
     circuitConfig: CircuitConfiguration,
     circuitListener: CircuitStateListener = CircuitStateListener.empty
-  ) {
+  ) = {
     this(new CircuitBreaker(circuitName, circuitConfig, circuitListener))
   }
 
@@ -130,23 +130,21 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
 
   // -- private methods -------------------------------------------------------
 
-  private def onStart() {
+  private def onStart() = {
     circuitBreaker.recordCall()
     if (circuitBreaker.isOpen) throw new OpenCircuitException(this)
   }
 
-  private def onSuccess(startNanosTsamp: Long) {
+  private def onSuccess(startNanosTsamp: Long) = {
     circuitBreaker.recordExecutionTime(System.nanoTime - startNanosTsamp)
   }
 
-  private def onFailure(e: Throwable) {
-    circuitBreaker.recordThrowable(e)
-  }
+  private def onFailure(e: Throwable) = circuitBreaker.recordThrowable(e)
 }
 
 private object CircuitExecutor {
   val currentThreadExecutor: ExecutionContext = ExecutionContext.fromExecutor(new Executor {
-    def execute(command: Runnable) {
+    def execute(command: Runnable): Unit = {
       command.run()
     }
   })
