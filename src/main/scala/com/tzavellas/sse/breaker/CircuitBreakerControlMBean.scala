@@ -11,8 +11,8 @@ private trait CircuitBreakerControlMBean {
   def getName: String
   
   def isOpen: Boolean
-  def open()
-  def close()
+  def open(): Unit
+  def close(): Unit
   
   def getMaxFailures: Int
   def setMaxFailures(max: Int): Unit

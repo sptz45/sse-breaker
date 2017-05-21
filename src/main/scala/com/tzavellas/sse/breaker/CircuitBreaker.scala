@@ -35,9 +35,8 @@ class CircuitBreaker(
   private[this] val failures = new AtomicInteger
   private[this] val timesOpened = new AtomicInteger
   
-  private[breaker] def recordCall() {
+  private[breaker] def recordCall(): Unit =
     calls.incrementAndGet()
-  }
   
   private[breaker] def recordExecutionTime(nanos: Long): Unit = {
     if (nanos > conf.maxMethodDuration.toNanos) {
