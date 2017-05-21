@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 
 class CircuitBreakerControlTest extends SynchronousCircuitDriver {
 
-  val executor = new CircuitExecutor("control-test", defaults) with CircuitJmxExporter
+  val executor = new CircuitExecutor("control-test", defaults)
   private val control  = new CircuitBreakerControl(circuit)
   
   
