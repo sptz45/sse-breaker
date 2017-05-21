@@ -10,8 +10,6 @@ import javax.management._
 trait CircuitJmxExporter {
   
   val circuitBreaker: CircuitBreaker
-  
-  import CircuitJmxExporter._
 
   /**
    * Register a `CircuitBreakerControlMBean` for this executor in the platform
@@ -19,14 +17,20 @@ trait CircuitJmxExporter {
    */
   def exportToJmx(): Unit = {
     val mbean = new CircuitBreakerControl(circuitBreaker)
-    server.registerMBean(mbean, objectNameOf(circuitBreaker))
+    server.registerMBean(mbean, objectName)
   }
   
   /**
    * Unregister the `CircuitBreakerControlMBean` that is associated with this
    * executor from the platform MBean server.
    */
-  def removeFromJmx(): Unit = server.unregisterMBean(objectNameOf(circuitBreaker))
+  def removeFromJmx(): Unit = server.unregisterMBean(objectName)
+
+  /**
+   * The object name that will be used for registering the circuit breaker mbean
+   * to JMX.
+   */
+  protected def objectName: ObjectName = CircuitJmxExporter.objectNameOf(circuitBreaker)
   
   private def server = ManagementFactory.getPlatformMBeanServer
 }

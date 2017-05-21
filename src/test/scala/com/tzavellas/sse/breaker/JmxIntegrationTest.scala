@@ -5,7 +5,8 @@
 package com.tzavellas.sse.breaker
 
 import java.lang.management.ManagementFactory
-import javax.management.JMX
+import javax.management.{JMX, ObjectName}
+
 import org.junit.Test
 import org.junit.Assert._
 
@@ -31,5 +32,25 @@ class JmxIntegrationTest {
     executor.removeFromJmx()
     val set = server.queryMBeans(CircuitJmxExporter.objectNameOf(circuit), null)
     assertTrue(set.isEmpty)
+  }
+
+  @Test
+  def register_using_non_default_object_name(): Unit = {
+    val executor = new CircuitExecutor("jmx-test", DefaultTestConfiguration) with MyExporter
+
+    executor.exportToJmx()
+
+    val mbean = JMX.newMBeanProxy(
+      server,
+      new ObjectName(s"package:type=CircuitBreaker,name=${executor.circuitBreaker.name}"),
+      classOf[CircuitBreakerControlMBean])
+    assertFalse(mbean.isOpen)
+
+    executor.removeFromJmx()
+  }
+
+  trait MyExporter extends CircuitJmxExporter {
+    override protected def objectName: ObjectName =
+      new ObjectName(s"package:type=CircuitBreaker,name=${circuit.name}")
   }
 }
