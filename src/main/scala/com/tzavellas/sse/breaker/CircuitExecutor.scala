@@ -117,16 +117,8 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
    * @return the result of the operation execution or a failed `Future` that
    *         contains `OpenCircuitException` if the circuit-breaker is ''open''.
    */
-  def async[T](operation: => T)(implicit executor: ExecutionContext): Future[T] = {
-    val start = System.nanoTime
-    try onStart() catch { case e: OpenCircuitException => return Future.failed(e) }
-    val result = Future(operation)(executor)
-    result.onComplete({
-      case Success(_) => onSuccess(start)
-      case Failure(e) => onFailure(e)
-    })(CircuitExecutor.currentThreadExecutor)
-    result
-  }
+  def async[T](operation: => T)(implicit executor: ExecutionContext): Future[T] =
+    apply(Future(operation))
 
   // -- private methods -------------------------------------------------------
 
