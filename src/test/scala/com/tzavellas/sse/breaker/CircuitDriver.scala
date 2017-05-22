@@ -12,8 +12,8 @@ trait CircuitDriver {
 
   lazy val defaults = DefaultTestConfiguration
 
-  def circuit = executor.circuitBreaker
-  def config  = circuit.configuration
+  def circuit: CircuitBreaker = executor.circuitBreaker
+  def config: CircuitConfiguration = circuit.configuration
 
   def reconfigureWith(
     maxFailures: Int = defaults.maxFailures,
@@ -22,7 +22,7 @@ trait CircuitDriver {
     maxMethodDuration: Duration = defaults.maxMethodDuration,
     isFailure: Throwable => Boolean = defaults.isFailure): Unit = {
     circuit.reconfigureWith(
-      new CircuitConfiguration(
+      CircuitConfiguration(
         maxFailures,
         openCircuitTimeout,
         failureCountTimeout,
@@ -34,7 +34,7 @@ trait CircuitDriver {
   def faultyOperation: Any
 
   def makeNormalCall(circuitIsOpen: Boolean = false): Any
-  def makeCallWithNonLocalReturn(): Int
+  def makeCallWithNonLocalReturn(): Any
   def generateFaults(numOfFaults: Int): Unit
 
   def makeSlowCall(): Unit = {

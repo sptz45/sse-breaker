@@ -12,9 +12,9 @@ import org.junit.Assert._
 
 class JmxIntegrationTest {
 
-  val server = ManagementFactory.getPlatformMBeanServer
-  val executor = new CircuitExecutor("jmx-test", DefaultTestConfiguration) with CircuitJmxExporter
-  def circuit = executor.circuitBreaker
+  private val server = ManagementFactory.getPlatformMBeanServer
+  private val executor = new CircuitExecutor("jmx-test", DefaultTestConfiguration) with CircuitJmxExporter
+  private def circuit = executor.circuitBreaker
   
   @Test
   def register_and_use_the_mbean(): Unit = {

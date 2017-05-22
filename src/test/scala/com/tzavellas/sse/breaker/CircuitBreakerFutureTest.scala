@@ -25,17 +25,10 @@ class CircuitBreakerFutureTest extends AbstractCircuitBreakerTest with CircuitDr
     }
   }
 
-  def makeCallWithNonLocalReturn(): Int = {
-    val f: Future[Int] = executor { return 43 }
-    f.value.get match {
-      case Success(i) => i
-      case Failure(e) => throw new AssertionError("Unexpected exception!", e)
-    }
-  }
+  def makeCallWithNonLocalReturn(): Any = executor { return Future.successful(43) }
 
-  def generateFaults(numOfFaults: Int): Unit = {
-    for (i <- 0 until numOfFaults) executor { faultyOperation }
-  }
+  def generateFaults(numOfFaults: Int): Unit =
+    for (_ <- 0 until numOfFaults) executor { faultyOperation }
 
   def normalOperation: Future[Int] = Future.successful(42)
   def faultyOperation: Future[Int] = throw new IllegalStateException

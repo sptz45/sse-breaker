@@ -9,40 +9,40 @@ import scala.concurrent.duration.Duration
 
 private class CircuitBreakerControl(circuit: CircuitBreaker) extends CircuitBreakerControlMBean {
 
-  def config = circuit.configuration
+  def config: CircuitConfiguration = circuit.configuration
   
-  def getName = circuit.name
+  def getName: String = circuit.name
   
-  def isOpen = circuit.isOpen
-  def open() = circuit.open()
-  def close() = circuit.close()
+  def isOpen: Boolean = circuit.isOpen
+  def open(): Unit = circuit.open()
+  def close(): Unit = circuit.close()
   
-  def getMaxFailures = config.maxFailures
-  def setMaxFailures(max: Int) = {
+  def getMaxFailures: Int = config.maxFailures
+  def setMaxFailures(max: Int): Unit = {
     circuit.reconfigureWith(config.copy(maxFailures=max))
   }
   
-  def getOpenCircuitTimeout = config.openCircuitTimeout.toString
-  def setOpenCircuitTimeout(timeout: String) = {
+  def getOpenCircuitTimeout: String = config.openCircuitTimeout.toString
+  def setOpenCircuitTimeout(timeout: String): Unit = {
     circuit.reconfigureWith(config.copy(openCircuitTimeout=Duration(timeout)))
   }
   
-  def getFailureCountTimeout = config.failureCountTimeout.toString
-  def setFailureCountTimeout(timeout: String) = {
+  def getFailureCountTimeout: String = config.failureCountTimeout.toString
+  def setFailureCountTimeout(timeout: String): Unit = {
     circuit.reconfigureWith(config.copy(failureCountTimeout=Duration(timeout)))
   }
   
   def getOpenedTimestamp = new Date(circuit.openedTimestamp)
   
-  def getCurrentFailures = circuit.numberOfCurrentFailures
-  def getFailedOperations = circuit.numberOfFailedOperations
-  def getTotalOperations = circuit.numberOfOperations
-  def getNumberOfTimesOpened = circuit.numberOfTimesOpened
+  def getCurrentFailures: Int = circuit.numberOfCurrentFailures
+  def getFailedOperations: Int = circuit.numberOfFailedOperations
+  def getTotalOperations: Int = circuit.numberOfOperations
+  def getNumberOfTimesOpened: Int = circuit.numberOfTimesOpened
   
-  def resetStatistics() = circuit.resetStatistics()
+  def resetStatistics(): Unit = circuit.resetStatistics()
 
-  def getMaxMethodDuration = config.maxMethodDuration.toString
-  def setMaxMethodDuration(duration: String) = {
+  def getMaxMethodDuration: String = config.maxMethodDuration.toString
+  def setMaxMethodDuration(duration: String): Unit = {
     circuit.reconfigureWith(config.copy(maxMethodDuration = Duration(duration)))
   }
 }

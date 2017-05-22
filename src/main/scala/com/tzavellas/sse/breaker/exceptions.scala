@@ -39,5 +39,7 @@ private class ForcedOpenException(circuitName: String)
   extends CircuitBreakerException(s"Circuit '$circuitName' opened after user's request.")
 
 
-private class SlowMethodExecutionException(val maxMethodDuration: Duration) extends CircuitBreakerException
+private class SlowMethodExecutionException(val maxMethodDuration: Duration)
+  extends CircuitBreakerException
+    //with NoStackTrace
 

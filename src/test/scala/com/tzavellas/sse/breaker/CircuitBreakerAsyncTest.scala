@@ -5,8 +5,8 @@
 package com.tzavellas.sse.breaker
 
 import org.junit.Test
-import scala.util.Success
-import scala.util.Failure
+
+import scala.util.{Failure, Success}
 
 class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDriver {
 
@@ -26,17 +26,10 @@ class CircuitBreakerAsyncTest extends AbstractCircuitBreakerTest with CircuitDri
     }
   }
 
-  def makeCallWithNonLocalReturn(): Int = {
-    val f = executor.async { return 43 }
-    f.value.get match {
-      case Success(i) => i
-      case Failure(e) => throw new AssertionError("Unexpected exception!", e)
-    }
-  }
+  def makeCallWithNonLocalReturn(): Any = executor.async { return 43 }
 
-  def generateFaults(numOfFaults: Int): Unit = {
-    for (i <- 0 until numOfFaults) executor.async(faultyOperation)
-  }
+  def generateFaults(numOfFaults: Int): Unit =
+    for (_ <- 0 until numOfFaults) executor.async(faultyOperation)
 
   def normalOperation = 42
   def faultyOperation = throw new IllegalStateException

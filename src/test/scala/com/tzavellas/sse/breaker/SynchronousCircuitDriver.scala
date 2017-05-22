@@ -16,14 +16,13 @@ trait SynchronousCircuitDriver extends CircuitDriver {
     }
   }
 
-  def makeCallWithNonLocalReturn(): Int = executor { return 43 }
+  def makeCallWithNonLocalReturn(): Any = executor { return 43 }
 
-  def generateFaults(numOfFaults: Int): Unit = {
-    for (i <- 0 until numOfFaults)
+  def generateFaults(numOfFaults: Int): Unit =
+    for (_ <- 0 until numOfFaults)
       try executor(faultyOperation) catch { case _: Exception => () }
-  }
 
   def normalOperation = 42
 
-  def faultyOperation = throw new IllegalStateException
+  def faultyOperation: Int = throw new IllegalStateException
 }

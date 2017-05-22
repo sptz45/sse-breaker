@@ -87,7 +87,7 @@ class CircuitBreaker(
    * occurred in a configured amount of time and the opened state hasn't
    * expired yet.
    */
-  def isOpen = currentFailures.get >= conf.maxFailures && !isHalfOpen
+  def isOpen: Boolean = currentFailures.get >= conf.maxFailures && !isHalfOpen
   
   /**
    * Tests if the circuit-breaker is in the ''closed'' state.
@@ -95,7 +95,7 @@ class CircuitBreaker(
    * A circuit-breaker is in the ''closed'' state when the error rate is low
    * and it allows the execution of the requested operations.
    */
-  def isClosed = !isOpen
+  def isClosed: Boolean = !isOpen
   
   /**
    * Tests if the circuit-breaker is in the ''half-open'' state.
@@ -103,7 +103,7 @@ class CircuitBreaker(
    * A circuit-breaker is in the ''half-open'' state when the ''open'' state
    * has expired.
    */
-  def isHalfOpen = {
+  def isHalfOpen: Boolean = {
     val timestamp = openTimestamp.get
     timestamp != 0 && timestamp + conf.openCircuitTimeout.toMillis <= System.currentTimeMillis
   }
@@ -137,7 +137,7 @@ class CircuitBreaker(
   }
 
   /** The current configuration. */
-  def configuration = conf
+  def configuration: CircuitConfiguration = conf
   
   /** Reconfigures this circuit-breaker using the specified configuration. */
   def reconfigureWith(newConf: CircuitConfiguration): Unit = { conf = newConf }
@@ -146,25 +146,25 @@ class CircuitBreaker(
    * The timestamp of the last transition to the open state (zero when the
    * circuit-breaker is in the closed state).
    */
-  def openedTimestamp = openTimestamp.get
+  def openedTimestamp: Long = openTimestamp.get
   
   /**
    * The number of failures since the circuit breaker entered the closed
    * state.
    */
-  def numberOfCurrentFailures = currentFailures.get
+  def numberOfCurrentFailures: Int = currentFailures.get
   
   /**
    * The number of operations that threw an exception or took too long to
    * complete.
    */
-  def numberOfFailedOperations = failures.get
+  def numberOfFailedOperations: Int = failures.get
   
   /** The number of operations (failed and successful). */
-  def numberOfOperations = calls.get
+  def numberOfOperations: Int = calls.get
   
   /** The number of times this circuit breaker has entered the open state. */
-  def numberOfTimesOpened = timesOpened.get
+  def numberOfTimesOpened: Int = timesOpened.get
   
   /**
    * Resets the statistics counters to zero.

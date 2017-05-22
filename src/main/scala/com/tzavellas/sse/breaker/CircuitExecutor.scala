@@ -127,8 +127,8 @@ class CircuitExecutor private (val circuitBreaker: CircuitBreaker) {
     if (circuitBreaker.isOpen) throw new OpenCircuitException(this)
   }
 
-  private def onSuccess(startNanosTsamp: Long) = {
-    circuitBreaker.recordExecutionTime(System.nanoTime - startNanosTsamp)
+  private def onSuccess(startTimestamp: Long) = {
+    circuitBreaker.recordExecutionTime(System.nanoTime - startTimestamp)
   }
 
   private def onFailure(e: Throwable) = circuitBreaker.recordThrowable(e)
